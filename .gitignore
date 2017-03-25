@@ -1,5 +1,5 @@
-server/node_modules
-server/public/assets/javascript/bundle.js
-server/public/assets/stylesheets/styles.css
+node_modules
+public/assets/javascript/bundle.js
+public/assets/stylesheets/styles.css
 
 .vscode

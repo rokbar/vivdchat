@@ -12,13 +12,13 @@ gulp.task('default', ['jshint', 'build-css', 'build-js'], function() {
 });
 
 gulp.task('jshint', function() {
-  return gulp.src('source/javascript/**/*.js')
+  return gulp.src('src/javascript/**/*.js')
     .pipe(jshint())
     .pipe(jshint.reporter('jshint-stylish'));
 });
 
 gulp.task('build-css', function() {
-  return gulp.src('source/scss/**/*.scss')
+  return gulp.src('src/scss/**/*.scss')
     .pipe(sourcemaps.init())
       .pipe(sass())
       .pipe(concat('styles.css'))
@@ -28,7 +28,7 @@ gulp.task('build-css', function() {
 });
 
 gulp.task('build-js', function() {
-  return gulp.src('source/javascript/**/*.js')
+  return gulp.src('src/javascript/**/*.js')
     .pipe(sourcemaps.init())
       .pipe(concat('bundle.js'))
       //only uglify if gulp is ran with '--type production'
@@ -38,7 +38,7 @@ gulp.task('build-js', function() {
 });
 
 gulp.task('watch', function() {
-  gulp.watch('source/javascript/**/*.js', ['jshint']);
-  gulp.watch('source/scss/**/*.scss', ['build-css']);
-  gulp.watch('source/javascript/**/*.js', ['build-js']);
+  gulp.watch('src/javascript/**/*.js', ['jshint']);
+  gulp.watch('src/scss/**/*.scss', ['build-css']);
+  gulp.watch('src/javascript/**/*.js', ['build-js']);
 });

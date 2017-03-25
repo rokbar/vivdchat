@@ -1,18 +1,31 @@
-var express = require('express');
-var path = require('path');
-var http = require('http');
-var socket = require('socket.io');
-var app = express();
+const express = require('express');
+const path = require('path');
+const http = require('http');
+const socket = require('socket.io');
+const app = express();
+const router = require('./router');
+const mongoose = require('mongoose');
+const morgan = require('morgan');
+const cors = require('cors');
+const bodyParser = require('body-parser');
 
 const server = http.createServer(app);
 const io = socket(server);
 
-const port = process.env.PORT || 3000;
+// DB setup
+mongoose.connect('mongodb://localhost:chat-app/chat-app');
 
+// App setup
+app.use(morgan('combined'));
+app.use(cors());
+app.use(bodyParser.json({ type: '*/*' }));
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public/assets')));
+router(app);
 
+const port = process.env.PORT || 3000;
 
+// TODO: move somewhere else
 app.get('/', function(req, res) {
   res.render('index', { title: 'Socket.io chat'});
 });
