@@ -1,3 +1,5 @@
 server/node_modules
-client/node_modules
+server/public/assets/javascript/bundle.js
+server/public/assets/stylesheets/styles.css
+
 .vscode
