@@ -18,7 +18,8 @@ mongoose.connect('mongodb://localhost:chat-app/chat-app');
 // App setup
 app.use(morgan('combined'));
 app.use(cors());
-app.use(bodyParser.json({ type: '*/*' }));
+//app.use(bodyParser.json({ type: '*/*' }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public/assets')));
 router(app);
@@ -26,10 +27,6 @@ router(app);
 const port = process.env.PORT || 3000;
 
 // TODO: move somewhere else
-app.get('/', function(req, res) {
-  res.render('index', { title: 'Socket.io chat'});
-});
-
 io.on('connection', function(socket) {
   console.log('a user connected');
   
