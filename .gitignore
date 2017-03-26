@@ -2,5 +2,6 @@ node_modules
 public/assets/javascript/bundle.js
 public/assets/stylesheets/styles.css
 config
+npm-debug.log
 
 .vscode
