@@ -9,9 +9,19 @@ class Chat extends Component {
   constructor(props) {
     super(props);
     this.state = { term: '' };
-
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
+  }
+
+  renderMessages() {
+    return this.props.messages.map((message, index) => {
+      return (
+        <li
+          key={index}>
+          {message.user}: {message.message}
+        </li>
+      );
+    });
   }
 
   handleChange(event) {
@@ -35,7 +45,9 @@ class Chat extends Component {
 
     return (
       <div id="messages">
-        <ul></ul>
+        <ul>
+          {this.renderMessages()}
+        </ul>
         <form onSubmit={this.handleSubmit}>
           <input id="m" autoComplete="off"
             value={this.state.term}
@@ -48,7 +60,10 @@ class Chat extends Component {
 }
 
 function mapStateToProps(state) {
-  return { message: state.auth.message };
+  return {
+    message: state.auth.message,
+    messages: state.messages
+  };
 }
 
 export default connect(mapStateToProps, actions)(Chat);
