@@ -9,8 +9,17 @@ class Chat extends Component {
   constructor(props) {
     super(props);
     this.state = { term: '' };
+
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
+
+    socket.on('receive message', (message) => {
+      this.updateChatFromSockets(message);
+    });
+  }
+
+  updateChatFromSockets(message) {
+    this.props.receiveMessage(message);
   }
 
   renderMessages() {
@@ -18,21 +27,23 @@ class Chat extends Component {
       return (
         <li
           key={index}>
-          {message.user}: {message.message}
+          {message.username}: {message.term}
         </li>
       );
     });
   }
 
   handleChange(event) {
-    console.log(event.target.value);
     this.setState({ term: event.target.value });
   }
 
   handleSubmit(event) {
     event.preventDefault();
-    console.log(this.state.term);
-    socket.emit('chat message', this.state.term);
+    const message = {
+      term: this.state.term,
+      username: this.props.username
+    }
+    socket.emit('send message', message);
     this.setState({ term: '' });
   }
 
@@ -41,8 +52,6 @@ class Chat extends Component {
   }
 
   render() {
-    const { handleSubmit } = this.props;
-
     return (
       <div id="messages">
         <ul>
@@ -62,6 +71,7 @@ class Chat extends Component {
 function mapStateToProps(state) {
   return {
     message: state.auth.message,
+    username: state.auth.username,
     messages: state.messages
   };
 }
