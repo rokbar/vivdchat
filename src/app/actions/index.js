@@ -66,7 +66,6 @@ export function signoutUser() {
   return { type: UNAUTH_USER };
 }
 
-// redux-thunk
 export function fetchMessage() {
   return function(dispatch) {
     axios.get(ROOT_URL, {
