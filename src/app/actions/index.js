@@ -8,6 +8,7 @@ import {
   RECEIVE_MESSAGE
 } from './types';
 
+// TODO: move to config file
 const ROOT_URL = 'http://localhost:3000';
 
 export function signinUser({ username, password }) {

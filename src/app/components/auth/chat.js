@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../../actions';
 import io from 'socket.io-client';
+import MessageList from './message_list';
 
 const socket = io('http://localhost:3000');
 
@@ -20,17 +21,6 @@ class Chat extends Component {
 
   updateChatFromSockets(message) {
     this.props.receiveMessage(message);
-  }
-
-  renderMessages() {
-    return this.props.messages.map((message, index) => {
-      return (
-        <li
-          key={index}>
-          {message.username}: {message.term}
-        </li>
-      );
-    });
   }
 
   handleChange(event) {
@@ -54,9 +44,7 @@ class Chat extends Component {
   render() {
     return (
       <div id="messages">
-        <ul>
-          {this.renderMessages()}
-        </ul>
+        <MessageList messages={this.props.messages} />
         <form onSubmit={this.handleSubmit}>
           <input id="m" autoComplete="off"
             value={this.state.term}
