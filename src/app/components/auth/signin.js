@@ -27,12 +27,10 @@ class Signin extends Component {
         <fieldset className="form-group">
           <label>Username:</label>
           <Field name="username" component="input" className="form-control" />
-          {/*<input {...email} className="form-control" /> redux-form ^5.0.0/*/}
         </fieldset>
         <fieldset className="form-group">
           <label>Password:</label>
           <Field name="password" type="password" component="input" className="form-control" />
-          {/*<input {...password} className="form-control" /> redux-form ^5.0.0/*/}
         </fieldset>
         {this.renderAlert()}
         <button action="submit" className="btn btn-primary">Sign in</button>
