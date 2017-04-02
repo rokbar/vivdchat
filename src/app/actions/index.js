@@ -19,11 +19,11 @@ export function signinUser({ username, password }) {
         // If request is good...
         // - Update state to indicate user is authenticated
         dispatch({
-          type: AUTH_USER,
-          payload: username
+          type: AUTH_USER
         });
-        // - Save the JWT token
+        // - Save the JWT token and username
         localStorage.setItem('token', response.data.token);
+        localStorage.setItem('username', username);
         // - Redirect to the route '/'
         browserHistory.push('/chat');
       })
@@ -40,10 +40,10 @@ export function signupUser({ username, password }) {
     axios.post(`${ROOT_URL}/signup`, { username, password })
       .then(response => {
         dispatch({
-          type: AUTH_USER,
-          paylaod: username
+          type: AUTH_USER
         });
         localStorage.setItem('token', response.data.token);
+        localStorage.setItem('username', username);
         browserHistory.push('/chat');
       })
       .catch(error => {
@@ -62,6 +62,7 @@ export function authError(error) {
 
 export function signoutUser() {
   localStorage.removeItem('token');
+  localStorage.removeItem('username');
 
   return { type: UNAUTH_USER };
 }

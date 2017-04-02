@@ -13,8 +13,6 @@ module.exports = function(server) {
 
   io.sockets
     .on('connection', function(socket) {
-      console.log(socket.handshake, 'connected');
-
       // send message event listener
       socket.on('send message', function(message) {
         io.emit('receive message', message);

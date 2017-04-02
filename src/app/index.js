@@ -13,17 +13,15 @@ import Chat from './components/auth/chat/chat';
 import RequireAuth from './components/auth/require_auth';
 import Welcome from './components/welcome';
 import reducers from './reducers';
-import { AUTH_USER } from './actions/types';
+import { INIT } from './actions/types';
+import localStorageLoad from './middleware/localStorageLoad';
 
-const createStoreWithMiddleware = applyMiddleware(reduxThunk)(createStore);
+// localStorageLoad - middleware to load initial authentication state from localStorage variables
+const createStoreWithMiddleware = applyMiddleware(localStorageLoad, reduxThunk)(createStore);
 const store = createStoreWithMiddleware(reducers);
 
-const token = localStorage.getItem('token');
-// If we have a token, consider the user to be signed in
-if (token) {
-  //we need to update application state
-  store.dispatch({ type: AUTH_USER });
-}
+// fire an initialization action before app renders
+store.dispatch({ type: INIT });
 
 ReactDOM.render(
   <Provider store={store}>

@@ -21,7 +21,7 @@ class MessageInput extends Component {
 
     const message = {
       term: this.state.term,
-      username: this.props.username
+      username: localStorage.getItem('username')
     }
     this.socket.emit('send message', message);
     this.setState({ term: '' });
@@ -39,10 +39,4 @@ class MessageInput extends Component {
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    username: state.auth.username,
-  };
-}
-
-export default connect(mapStateToProps, actions)(MessageInput);
+export default connect(null, actions)(MessageInput);
