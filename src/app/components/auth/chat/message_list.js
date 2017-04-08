@@ -5,6 +5,7 @@ const MessageList = (props) => {
     return (
       <li
         key={index}>
+        <img src={message.gif} />
         {message.username}: {message.term}
       </li>
     );
