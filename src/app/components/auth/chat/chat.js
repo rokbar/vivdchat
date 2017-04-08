@@ -26,6 +26,10 @@ class Chat extends Component {
     this.props.receiveMessage(message);
   }
 
+  componentDidUpdate() {
+    window.scrollTo(0, document.body.scrollHeight);
+  }
+
   componentWillUnmount() {
     this.socket.disconnect();
   }
@@ -35,6 +39,8 @@ class Chat extends Component {
       <div>
         <div id="messages">
           <MessageList messages={this.props.messages} />
+        </div>
+        <div id="inputs">
           <MessageInput socket={this.socket} />
         </div>
       </div>
