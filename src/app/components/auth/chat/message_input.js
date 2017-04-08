@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import * as actions from '../../../actions/types';
+import { appendMessage } from '../../../actions';
 import gifShot from 'gifshot';
 
 class MessageInput extends Component {
@@ -12,6 +12,7 @@ class MessageInput extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.createGif = this.createGif.bind(this);
+    console.log(this);
   }
 
   handleChange(event) {
@@ -31,7 +32,7 @@ class MessageInput extends Component {
       fontWeight: 'bold',
       fontSize: '20px',
       fontColor: '#f6f6f6'
-    }, function(obj) {
+    }, (obj) => {
       if(!obj.error) {
         self.setState({ gif: obj.image });
 
@@ -40,6 +41,7 @@ class MessageInput extends Component {
           username: localStorage.getItem('username'),
           gif: self.state.gif
         }
+        self.props.appendMessage(message);
         self.socket.emit('send message', message);
         self.setState({ term: '', gif: '' });
       }
@@ -58,4 +60,4 @@ class MessageInput extends Component {
   }
 }
 
-export default connect(null, actions)(MessageInput);
+export default connect(null, { appendMessage })(MessageInput);

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Field, reduxForm } from 'redux-form'; // redux-form ^6.0.0
 import { connect } from 'react-redux';
-import * as actions from '../../actions';
+import { signupUser } from '../../actions';
 
 class Signup extends Component {
   handleFormSubmit(formProps) {
@@ -80,4 +80,4 @@ Signup = reduxForm({
   validate
 })(Signup);
 
-export default connect(mapStateToProps, actions)(Signup);
+export default connect(mapStateToProps, { signupUser })(Signup);

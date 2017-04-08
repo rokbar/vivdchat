@@ -5,6 +5,7 @@ import {
   UNAUTH_USER,
   AUTH_ERROR,
   FETCH_MESSAGE,
+  APPEND_MESSAGE,
   RECEIVE_MESSAGE
 } from './types';
 
@@ -78,6 +79,13 @@ export function fetchMessage() {
           payload: response.data.message
         });
       });
+  }
+}
+
+export function appendMessage(message) {
+  return {
+    type: APPEND_MESSAGE,
+    payload: message
   }
 }
 

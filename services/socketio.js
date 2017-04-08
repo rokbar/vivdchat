@@ -15,7 +15,7 @@ module.exports = function(server) {
     .on('connection', function(socket) {
       // send message event listener
       socket.on('send message', function(message) {
-        io.emit('receive message', message);
+        socket.broadcast.emit('receive message', message);
       });
 
       socket.on('disconnect', function() {

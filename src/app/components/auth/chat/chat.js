@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import * as actions from '../../../actions';
+import { receiveMessage } from '../../../actions';
 import io from 'socket.io-client';
 import MessageList from './message_list';
 import MessageInput from './message_input';
@@ -20,10 +20,10 @@ class Chat extends Component {
     this.socket.on('receive message', (message) => {
       this.updateChatFromSockets(message);
     });
+    console.log(this);
   }
 
   updateChatFromSockets(message) {
-    console.log(message);
     this.props.receiveMessage(message);
   }
 
@@ -49,4 +49,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, actions)(Chat);
+export default connect(mapStateToProps, { receiveMessage })(Chat);
