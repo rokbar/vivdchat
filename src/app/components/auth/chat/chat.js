@@ -20,7 +20,6 @@ class Chat extends Component {
     this.socket.on('receive message', (message) => {
       this.updateChatFromSockets(message);
     });
-    console.log(this);
   }
 
   updateChatFromSockets(message) {

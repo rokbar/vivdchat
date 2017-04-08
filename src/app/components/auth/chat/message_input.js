@@ -12,7 +12,6 @@ class MessageInput extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.createGif = this.createGif.bind(this);
-    console.log(this);
   }
 
   handleChange(event) {
@@ -26,16 +25,18 @@ class MessageInput extends Component {
 
   createGif() {
     let self = this;
-
     gifShot.createGIF({
       text: '#swag',
       fontWeight: 'bold',
       fontSize: '20px',
-      fontColor: '#f6f6f6'
+      'progressCallback': function(captureProgress) {
+        console.log(captureProgress);
+        document.querySelector("progress").style.visibility = "";
+        document.querySelector("progress").value = captureProgress;
+      }
     }, (obj) => {
       if(!obj.error) {
         self.setState({ gif: obj.image });
-
         const message = {
           term: self.state.term,
           username: localStorage.getItem('username'),
@@ -43,19 +44,28 @@ class MessageInput extends Component {
         }
         self.props.appendMessage(message);
         self.socket.emit('send message', message);
-        self.setState({ term: '', gif: '' });
+        self.setState({ term: '', gif: '' }); 
+        document.querySelector("progress").style.visibility = "hidden";
       }
     });
   }
 
   render () {
     return (
-      <form onSubmit={this.handleSubmit}>
-        <input id="m" autoComplete="off"
-          value={this.state.term}
-          onChange={this.handleChange} />
-        <button>Send</button>
-      </form>
+      <div>
+        <progress max="1" min="0" className="progress-bar" style={{visibility: 'hidden'}}></progress>
+        <form onSubmit={this.handleSubmit}>
+          <input id="m" autoComplete="off"
+            value={this.state.term}
+            onChange={this.handleChange}
+            placeholder="Your Message" />
+          <input id="g" autoComplete="off"
+            value={this.state.gifTerm}
+            onChange={this.handleChange}
+            placeholder="GIF text" />
+          <button>Send</button>
+        </form>
+      </div>
     );
   }
 }
