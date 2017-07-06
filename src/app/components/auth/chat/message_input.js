@@ -3,7 +3,11 @@ import { connect } from 'react-redux';
 import { appendMessage } from '../../../actions';
 import gifShot from 'gifshot';
 import _ from 'lodash';
-import { LinearProgress } from 'material-ui';
+import {
+  TextField,
+  LinearProgress, 
+} from 'material-ui';
+import MessageIcon from 'material-ui/svg-icons/communication/message';
 
 class MessageInput extends Component {
   constructor(props) {
@@ -69,19 +73,23 @@ class MessageInput extends Component {
     const handleSubmit = _.throttle((event) => { this.handleSubmit(event) }, 2000);
 
     return (
-
       <div>
         <LinearProgress mode="determinate" className="progress" value={this.state.completed} />
         <form onSubmit={handleSubmit}>
-          <input id="messageTerm" autoComplete="off"
+          {<MessageIcon color="rgb(0, 188, 212)" />}
+          <TextField
+            id="messageTerm"
+            floatingLabelText="Message"
             value={this.state.messageTerm}
             onChange={this.handleChange}
-            placeholder="Your Message" />
-          <input id="gifTerm" autoComplete="off"
+          />
+          <TextField
+            id="gifTerm"
+            floatingLabelText="GIF text"
             value={this.state.gifTerm}
             onChange={this.handleChange}
-            placeholder="GIF text" />
-          <button>Send</button>
+          />
+          <button tyoe="submit" hidden></button>
         </form>
       </div>
     );
