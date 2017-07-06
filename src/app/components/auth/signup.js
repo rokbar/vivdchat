@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Field, reduxForm } from 'redux-form'; // redux-form ^6.0.0
 import { connect } from 'react-redux';
 import { signupUser } from '../../actions';
+import { RaisedButton, TextField, Paper } from 'material-ui';
+import PersonIcon from 'material-ui/svg-icons/social/person';
 
 class Signup extends Component {
   handleFormSubmit(formProps) {
@@ -12,9 +14,11 @@ class Signup extends Component {
   renderAlert() {
     if (this.props.errormessage) {
       return (
-        <div className="alert alert-danger">
-          <strong>Opps!</strong> {this.props.errormessage}
-        </div>
+        <Paper zDepth={3}>
+          <div className="alert alert-danger">
+            <strong>Opps!</strong> {this.props.errormessage}
+          </div>
+        </Paper>
       );
     }
   }
@@ -24,28 +28,29 @@ class Signup extends Component {
 
     return (
       <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))}>
-        <fieldset className="form-group">
-          <Field component={renderField} name="username" label="Username:" type="text" />
-        </fieldset>
-        <fieldset className="form-group">
-          <Field component={renderField} name="password" label="Password:" type="password" />
-        </fieldset>
-        <fieldset className="form-group">
-          <Field component={renderField} name="passwordConfirm" label="Confirm Password:" type="password" />
-        </fieldset>
+        <Field component={renderField} name="username" label="Username" type="text" /><br />
+        <Field component={renderField} name="password" label="Password" type="password" /><br />
+        <Field component={renderField} name="passwordConfirm" label="Confirm Password:" type="password" /><br />
         {this.renderAlert()}
-        <button action="submit" className="btn btn-primary">Sign Up</button>
+        <RaisedButton
+          type="submit"
+          backgroundColor={'rgb(0, 188, 212)'}
+          labelColor={'rgb(255, 255, 255)'}
+          label="Sign Up"
+          icon={<PersonIcon />}
+        />
       </form>
     );
   }
 }
 
 const renderField = ({ input, label, type, meta: { touched, error } }) => (
-  <div>
-    <label>{label}</label><br />
-    <input type={type} className="form-control" {...input} />
-    {touched && error && <div className="error">{error}</div>}
-  </div>
+  <TextField
+    floatingLabelText={label}
+    type={type}
+    {...input}
+    errorText={touched && error}
+  />
 )
 
 const validate = formProps => {

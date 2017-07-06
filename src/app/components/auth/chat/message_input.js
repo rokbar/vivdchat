@@ -3,11 +3,21 @@ import { connect } from 'react-redux';
 import { appendMessage } from '../../../actions';
 import gifShot from 'gifshot';
 import _ from 'lodash';
+import {
+  TextField,
+  LinearProgress, 
+} from 'material-ui';
+import MessageIcon from 'material-ui/svg-icons/communication/message';
 
 class MessageInput extends Component {
   constructor(props) {
     super(props);
-    this.state = { messageTerm: '', gifTerm: '', gif: '' };
+    this.state = { 
+      messageTerm: '',
+      gifTerm: '', 
+      gif: '',
+      completed: 0,
+    };
 
     this.socket = this.props.socket;
     this.handleChange = this.handleChange.bind(this);
@@ -31,30 +41,32 @@ class MessageInput extends Component {
       text: this.state.gifTerm,
       fontWeight: 'bold',
       fontSize: '20px',
-      'progressCallback': function(captureProgress) {
-        document.querySelector("progress").style.visibility = "";
-        document.querySelector("progress").value = captureProgress;
+      gifWidth: '150',
+      gifHeight: '150',
+      progressCallback: (captureProgress) => {
+        this.setState({ completed: captureProgress * 100 });
         document.querySelector("button").disabled = true;
       }
     }
   }
 
   createGif() {
-    let self = this;
-
     gifShot.createGIF(this.createGifOptions(), (obj) => {
       if (!obj.error) {
-        self.setState({ gif: obj.image });  
+        this.setState({ gif: obj.image });  
+
         const message = {
-          term: self.state.messageTerm,
+          term: this.state.messageTerm,
           username: localStorage.getItem('username'),
-          gif: self.state.gif
+          gif: this.state.gif
         }
-        self.props.appendMessage(message);
-        self.socket.emit('send message', message);
-        self.setState({ messageTerm: '', gifTerm: '' }); 
-        document.querySelector("progress").style.visibility = "hidden";
+
+        this.props.appendMessage(message);
+        this.socket.emit('send message', message);
+        this.setState({ messageTerm: '', gifTerm: '' }); 
+
         document.querySelector("button").disabled = false;
+        this.setState({ completed: 0 });
       }
     });
   }
@@ -64,17 +76,22 @@ class MessageInput extends Component {
 
     return (
       <div>
-        <progress max="1" min="0" className="progress-bar" style={{visibility: 'hidden'}}></progress>
+        <LinearProgress mode="determinate" className="progress" value={this.state.completed} />
         <form onSubmit={handleSubmit}>
-          <input id="messageTerm" autoComplete="off"
+          {<MessageIcon color="rgb(0, 188, 212)" />}
+          <TextField
+            id="messageTerm"
+            floatingLabelText="Message"
             value={this.state.messageTerm}
             onChange={this.handleChange}
-            placeholder="Your Message" />
-          <input id="gifTerm" autoComplete="off"
+          />
+          <TextField
+            id="gifTerm"
+            floatingLabelText="GIF text"
             value={this.state.gifTerm}
             onChange={this.handleChange}
-            placeholder="GIF text" />
-          <button>Send</button>
+          />
+          <button type="submit" hidden></button>
         </form>
       </div>
     );

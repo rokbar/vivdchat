@@ -4,3 +4,4 @@ config
 npm-debug.log
 
 .vscode
+.idea
