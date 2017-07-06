@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Header from './header';
 import injectTapEventPlugin from 'react-tap-event-plugin';
+import { Paper } from 'material-ui';
 import { 
   MuiThemeProvider, 
   getMuiTheme, 
@@ -10,10 +11,10 @@ import {
 injectTapEventPlugin();
 
 const AppComponents = (props) => (
-  <div>
+  <Paper zDepth={2}>
     <Header />
     {props.children}
-  </div>
+  </Paper>
 );
 
 export default class App extends Component {

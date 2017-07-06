@@ -41,6 +41,8 @@ class MessageInput extends Component {
       text: this.state.gifTerm,
       fontWeight: 'bold',
       fontSize: '20px',
+      gifWidth: '150',
+      gifHeight: '150',
       progressCallback: (captureProgress) => {
         this.setState({ completed: captureProgress * 100 });
         document.querySelector("button").disabled = true;
@@ -89,7 +91,7 @@ class MessageInput extends Component {
             value={this.state.gifTerm}
             onChange={this.handleChange}
           />
-          <button tyoe="submit" hidden></button>
+          <button type="submit" hidden></button>
         </form>
       </div>
     );
