@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Field, reduxForm } from 'redux-form';
 import { connect } from 'react-redux'
 import { signinUser } from '../../actions';
+import { RaisedButton, TextField, Paper } from 'material-ui';
+import PersonIcon from 'material-ui/svg-icons/social/person';
 
 class Signin extends Component {
   handleFormSubmit({ username, password }) {
@@ -12,9 +14,11 @@ class Signin extends Component {
   renderAlert() {
     if (this.props.errormessage) {
       return (
-        <div className="alert alert-danger">
-          <strong>Oops!</strong> {this.props.errormessage}
-        </div>
+        <Paper zDepth={3}>
+          <div className="alert alert-danger">
+            <strong>Oops!</strong> {this.props.errormessage}
+          </div>
+        </Paper>
       )
     }
   }
@@ -24,16 +28,22 @@ class Signin extends Component {
 
     return (
       <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))}>
-        <fieldset className="form-group">
-          <label>Username:</label>
-          <Field name="username" component="input" className="form-control" />
-        </fieldset>
-        <fieldset className="form-group">
-          <label>Password:</label>
-          <Field name="password" type="password" component="input" className="form-control" />
-        </fieldset>
+        <TextField
+          floatingLabelText="Username"
+          children={<Field name="username" component="input" />}
+        /><br />
+        <TextField
+          floatingLabelText="Password"
+          children={<Field name="password" type="password" component="input" />}
+        /><br />
         {this.renderAlert()}
-        <button action="submit" className="btn btn-primary">Sign in</button>
+        <RaisedButton
+          type="submit"
+          backgroundColor={'rgb(0, 188, 212)'}
+          labelColor={'rgb(255, 255, 255)'}
+          label="Sign In"
+          icon={<PersonIcon />}
+        />
       </form>
     );
   }
