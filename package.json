@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "description": "socket.io chat-app",
   "scripts": {
-    "client": "node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js"
+    "client": "node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js",
+    "server": "nodemon ./app.js"
   },
   "dependencies": {
     "axios": "^0.15.3",
@@ -51,6 +52,6 @@
     "jshint-stylish": "^2.2.1",
     "nodemon": "^1.11.0",
     "webpack": "^2.3.2",
-    "webpack-dev-server": "^2.4.2"
+    "webpack-dev-server": "^2.9.2"
   }
 }

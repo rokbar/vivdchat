@@ -1,11 +1,23 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const ObjectId = Schema.Types.ObjectId;
 const bcrypt = require('bcrypt-nodejs');
+const { userGroupState } = require('./enums');
 
 // Define user model
 const userSchema = new Schema({
-  username: { type: String, unique: true },
-  password: String
+  username: { type: String, unique: true, required: true },
+  password: { type: String, required: true },
+  groups: [{
+     id: ObjectId,
+     isLeader: Boolean,
+     state: {
+      type: Number,
+      enum: Object.values(userGroupState),
+      default: userGroupState.UNACCEPTED,
+    },
+     _id: false,
+  }],
 });
 
 // On Save Hook, encrypt password

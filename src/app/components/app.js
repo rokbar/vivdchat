@@ -11,7 +11,7 @@ import {
 injectTapEventPlugin();
 
 const AppComponents = (props) => (
-  <Paper zDepth={2}>
+  <Paper style={styles.paper} zDepth={2}>
     <Header />
     {props.children}
   </Paper>
@@ -25,4 +25,10 @@ export default class App extends Component {
       </MuiThemeProvider>
     );
   }
+}
+
+const styles = {
+  paper: {
+    height: '100%',
+  },
 }

@@ -5,16 +5,16 @@ import gifShot from 'gifshot';
 import _ from 'lodash';
 import {
   TextField,
-  LinearProgress, 
+  LinearProgress,
 } from 'material-ui';
 import MessageIcon from 'material-ui/svg-icons/communication/message';
 
 class MessageInput extends Component {
   constructor(props) {
     super(props);
-    this.state = { 
+    this.state = {
       messageTerm: '',
-      gifTerm: '', 
+      gifTerm: '',
       gif: '',
       completed: 0,
     };
@@ -25,14 +25,14 @@ class MessageInput extends Component {
   }
 
   handleChange(event) {
-    let eti = String(event.target.id), newState = {}; 
+    let eti = String(event.target.id), newState = {};
 
     newState[eti] = event.target.value;
     this.setState(newState);
   }
 
-  handleSubmit(event) {  
-    event.preventDefault(); 
+  handleSubmit(event) {
+    event.preventDefault();
     this.createGif();
   };
 
@@ -53,7 +53,7 @@ class MessageInput extends Component {
   createGif() {
     gifShot.createGIF(this.createGifOptions(), (obj) => {
       if (!obj.error) {
-        this.setState({ gif: obj.image });  
+        this.setState({ gif: obj.image });
 
         const message = {
           term: this.state.messageTerm,
@@ -63,7 +63,7 @@ class MessageInput extends Component {
 
         this.props.appendMessage(message);
         this.socket.emit('send message', message);
-        this.setState({ messageTerm: '', gifTerm: '' }); 
+        this.setState({ messageTerm: '', gifTerm: '' });
 
         document.querySelector("button").disabled = false;
         this.setState({ completed: 0 });
@@ -75,8 +75,8 @@ class MessageInput extends Component {
     const handleSubmit = _.throttle((event) => { this.handleSubmit(event) }, 2000);
 
     return (
-      <div>
-        <LinearProgress mode="determinate" className="progress" value={this.state.completed} />
+      <div style={styles.messageInput}>
+        <LinearProgress style={styles.progressBar} mode="determinate" value={this.state.completed} />
         <form onSubmit={handleSubmit}>
           {<MessageIcon color="rgb(0, 188, 212)" />}
           <TextField
@@ -99,3 +99,11 @@ class MessageInput extends Component {
 }
 
 export default connect(null, { appendMessage })(MessageInput);
+
+const styles = {
+  messageInput: {
+    position: 'fixed',
+    bottom: 0,
+    padding: '0px 0px 10px 10px',
+  },
+};

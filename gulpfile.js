@@ -7,12 +7,12 @@ var gulp = require('gulp'),
     concat = require('gulp-concat'),
     cleanCSS = require('gulp-clean-css');
 
-gulp.task('default', ['jshint', 'build-css', 'build-js'], function() {
+gulp.task('default', ['build-css'], function() {
   return gutil.log('All tasks are DONE!');
 });
 
 gulp.task('jshint', function() {
-  return gulp.src('src/javascript/**/*.js')
+  return gulp.src('src/app/**/*.js')
     .pipe(jshint())
     .pipe(jshint.reporter('jshint-stylish'));
 });
@@ -28,7 +28,7 @@ gulp.task('build-css', function() {
 });
 
 gulp.task('build-js', function() {
-  return gulp.src('src/javascript/**/*.js')
+  return gulp.src('src/app/**/*.js')
     .pipe(sourcemaps.init())
       .pipe(concat('bundle.js'))
       //only uglify if gulp is ran with '--type production'
@@ -38,7 +38,5 @@ gulp.task('build-js', function() {
 });
 
 gulp.task('watch', function() {
-  gulp.watch('src/javascript/**/*.js', ['jshint']);
   gulp.watch('src/scss/**/*.scss', ['build-css']);
-  gulp.watch('src/javascript/**/*.js', ['build-js']);
 });
