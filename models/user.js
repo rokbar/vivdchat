@@ -20,6 +20,8 @@ const userSchema = new Schema({
   }],
 });
 
+userSchema.index({ username: 'text' });
+
 // On Save Hook, encrypt password
 // Before saving a model, run this function
 userSchema.pre('save', function(next) {
