@@ -2,6 +2,7 @@ module.exports = {
   entry: [
     './src/app/index.js'
   ],
+  devtool: 'inline-source-maps',
   output: {
     path: __dirname + '/public/assets',
     publicPath: '/assets',

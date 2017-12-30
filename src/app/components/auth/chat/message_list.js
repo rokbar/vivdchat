@@ -5,18 +5,21 @@ import {
   Subheader, 
   Paper, 
 } from 'material-ui';
+import moment from 'moment';
 
 const MessageList = (props) => {
   const messageItems = props.messages.map((message, index) => {
+    const time = moment(message.time).local().calendar();
     return (
       <ListItem
         key={index}
         children={
           <div>
+            <span>{time}</span>
             <img src={message.gif} />
             <span>
               &nbsp;<span style={styles.username}>{message.username}:</span>
-              &nbsp;{message.term}
+              &nbsp;{message.text}
             </span>
           </div>
         }

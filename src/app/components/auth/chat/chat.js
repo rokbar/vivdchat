@@ -9,17 +9,25 @@ class Chat extends Component {
   constructor(props) {
     super(props);
 
-    this.socket = io.connect('http://localhost:3000', {
-      'query': 'token=' + localStorage.getItem('token')
-    });
-    this.socket.on('connect', function () {
-      console.log('authenticated');
-    }).on('disconnect', function () {
-      console.log('disconnected');
-    });
-    this.socket.on('receive message', (message) => {
-      this.updateChatFromSockets(message);
-    });
+    this.socket = io.connect('http://localhost:3000');
+    this.socket
+      .on('connect', () => {
+        this.socket
+          .emit('authenticate', { token: localStorage.getItem('token') }) //send the jwt
+          .on('authenticated', function () {
+            console.log('authenticated');
+          })
+          .on('unauthorized', function (msg) {
+            console.log("unauthorized: " + JSON.stringify(msg.data));
+            throw new Error(msg.data.type);
+          })
+      })
+      .on('disconnect', function () {
+        console.log('disconnected');
+      })
+      .on('receive message', (message) => {
+        this.updateChatFromSockets(message);
+      });
   }
 
   updateChatFromSockets(message) {

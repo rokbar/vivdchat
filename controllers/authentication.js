@@ -4,7 +4,7 @@ const config = require('../config/index');
 
 function tokenForUser(user) {
   const timestamp = new Date().getTime();
-  return jwt.encode({ sub: user.id, iat: timestamp }, config.secret);
+  return jwt.encode({ sub: user.id, name: user.username, iat: timestamp }, config.secret);
 }
 
 exports.signin = function(req, res, next) {

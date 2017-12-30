@@ -1,9 +1,9 @@
 const User = require('../models/user');
 
 exports.findByName = function(req, res, next) {
-  const searchTerm = req.body.searchTerm;
+  const searchText = req.body.searchText;
 
-  User.find({ $text: { $search: searchTerm }})
+  User.find({ $text: { $search: searchText }})
   .sort({ username: 1 })
   .select({ _id: 1, username: 1})
   .exec(function(err, users) {

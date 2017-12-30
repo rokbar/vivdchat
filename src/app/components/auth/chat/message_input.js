@@ -13,8 +13,8 @@ class MessageInput extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      messageTerm: '',
-      gifTerm: '',
+      messageText: '',
+      gifText: '',
       gif: '',
       completed: 0,
     };
@@ -38,7 +38,7 @@ class MessageInput extends Component {
 
   createGifOptions() {
     return {
-      text: this.state.gifTerm,
+      text: this.state.gifText,
       fontWeight: 'bold',
       fontSize: '20px',
       gifWidth: '150',
@@ -56,14 +56,19 @@ class MessageInput extends Component {
         this.setState({ gif: obj.image });
 
         const message = {
-          term: this.state.messageTerm,
-          username: localStorage.getItem('username'),
-          gif: this.state.gif
+          text: this.state.messageText,
+          gif: this.state.gif,
+          gifText: this.state.gifText,
         }
 
-        this.props.appendMessage(message);
+        this.props.appendMessage({
+           ...message,
+           username: localStorage.getItem('username'),
+           time: Date.now(),
+        });
+
         this.socket.emit('send message', message);
-        this.setState({ messageTerm: '', gifTerm: '' });
+        this.setState({ messageText: '', gifText: '' });
 
         document.querySelector("button").disabled = false;
         this.setState({ completed: 0 });
@@ -80,15 +85,15 @@ class MessageInput extends Component {
         <form onSubmit={handleSubmit}>
           {<MessageIcon color="rgb(0, 188, 212)" />}
           <TextField
-            id="messageTerm"
+            id="messageText"
             floatingLabelText="Message"
-            value={this.state.messageTerm}
+            value={this.state.messageText}
             onChange={this.handleChange}
           />
           <TextField
-            id="gifTerm"
+            id="gifText"
             floatingLabelText="GIF text"
-            value={this.state.gifTerm}
+            value={this.state.gifText}
             onChange={this.handleChange}
           />
           <button type="submit" hidden></button>

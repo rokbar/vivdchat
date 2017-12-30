@@ -1,6 +1,7 @@
 const Authentication = require('./controllers/authentication');
 const Groups = require('./controllers/groups');
 const Users = require('./controllers/users');
+const GroupChat = require('./controllers/groupChat');
 const passport = require('passport');
 require('./services/passport');
 
