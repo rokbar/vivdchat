@@ -14,10 +14,11 @@ module.exports = function(app) {
   });
   app.post('/signup', Authentication.signup);
   app.post('/signin', requireSignin, Authentication.signin);
+  app.post('/users/search', requireAuth, Users.findByName);
+  app.get('/groups', requireAuth, Groups.getGroupsByUser);
   app.post('/groups/create', requireAuth, Groups.create);
   app.post('/groups/inviteUser', requireAuth, Groups.inviteUser);
   app.post('/groups/accept', requireAuth, Groups.accept);
-  // app.post('/groups/decline'. requireAuth, Groups.decline);
-  // app.post('/groups/leave'. requireAuth, Groups.leave);
-  app.post('/users/search', requireAuth, Users.findByName);
+  app.post('/groups/decline', requireAuth, Groups.decline);
+  app.post('/groups/leave', requireAuth, Groups.leave);
 }

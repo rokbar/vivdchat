@@ -3,6 +3,29 @@ const User = require('../models/user');
 const Invitation = require('../models/invitation');
 const { userGroupState } = require('../models/enums');
 const { isModelInArray } = require('../helpers/array');
+const { map, partialRight } = require('lodash');
+
+exports.getGroupsByUser = function(req, res, next) {
+  const userId = req.user.id;
+
+  Group.find({ users: { id: userId } }, function(err, existingGroups) {
+    if (err) { return next(err); }
+
+    if (existingGroups.length) {
+      const polishedGroups = map(existingGroups, (group) => {
+        const { id, name } = group;
+        const leader = group.leader.valueOf();
+        const user = group.users.find(partialRight(isModelInArray, userId));
+        return { id, leader, name, user }
+      });
+
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify(polishedGroups));
+    } 
+
+    return next('User does not belong to any group.');
+  });
+};
 
 exports.create = function (req, res, next) {
   const userId = req.user.id;
@@ -37,7 +60,7 @@ exports.inviteUser = function (req, res, next) {
   User.findById(newUserId, function (err, existingUser) {
     if (err) { return next(err); }
     if (newUserId === leaderId) {
-      return next('Invalid user.');
+      return next('Invalid user: selected user is group leader.');
     }
 
     if (existingUser) {
