@@ -8,7 +8,7 @@ import MessageInput from './message_input';
 class Chat extends Component {
   constructor(props) {
     super(props);
-
+    const groupId = "5a496a22384a411054209c1c";
     this.socket = io.connect('http://localhost:3000');
     this.socket
       .on('connect', () => {
@@ -17,12 +17,13 @@ class Chat extends Component {
           .on('authenticated', function () {
             console.log('authenticated');
           })
+          .emit('join room', groupId)
           .on('unauthorized', function (msg) {
             console.log("unauthorized: " + JSON.stringify(msg.data));
             throw new Error(msg.data.type);
           })
       })
-      .on('disconnect', function () {
+      .on('disconnect', () => {
         console.log('disconnected');
       })
       .on('receive message', (message) => {

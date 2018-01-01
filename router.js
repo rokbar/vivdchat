@@ -21,4 +21,5 @@ module.exports = function(app) {
   app.post('/groups/accept', requireAuth, Groups.accept);
   app.post('/groups/decline', requireAuth, Groups.decline);
   app.post('/groups/leave', requireAuth, Groups.leave);
+  app.post('/groups/:id', requireAuth, GroupChat.getMessagesByGroup);
 }

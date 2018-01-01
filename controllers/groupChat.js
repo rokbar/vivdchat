@@ -28,9 +28,20 @@ exports.getMessagesByGroup = function(req, res, next) {
   });
 };
 
+exports.createSocket = function(groupId, userId, callback) {
+  Group.findById(groupId, function(err, existingGroup) {
+    if (err) { throw new Error(err); }
+    if (existingGroup && existingGroup.users.find(isModelInArray.call(this, userId))) {
+      callback();
+      return;
+    } else {
+      console.log('Group does not exist or user does not belong to the group.');
+    }
+  });
+};
+
 exports.saveMessage = function(body, callback) {
-  const { text, gif, gifText, sub, username } = body;
-  const group = '123';
+  const { text, gif, gifText, sub, username, group } = body;
 
   const message = new Message({
     text,

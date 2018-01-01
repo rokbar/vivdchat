@@ -3,25 +3,25 @@ const User = require('../models/user');
 const Invitation = require('../models/invitation');
 const { userGroupState } = require('../models/enums');
 const { isModelInArray } = require('../helpers/array');
-const { map, partialRight } = require('lodash');
+const { map } = require('lodash');
 
-exports.getGroupsByUser = function(req, res, next) {
+exports.getGroupsByUser = function (req, res, next) {
   const userId = req.user.id;
 
-  Group.find({ users: { id: userId } }, function(err, existingGroups) {
+  Group.find({ users: { id: userId } }, function (err, existingGroups) {
     if (err) { return next(err); }
 
     if (existingGroups.length) {
       const polishedGroups = map(existingGroups, (group) => {
         const { id, name } = group;
         const leader = group.leader.valueOf();
-        const user = group.users.find(partialRight(isModelInArray, userId));
+        const user = group.users.find(isModelInArray.call(this, userId));
         return { id, leader, name, user }
       });
 
       res.setHeader('Content-Type', 'application/json');
       res.send(JSON.stringify(polishedGroups));
-    } 
+    }
 
     return next('User does not belong to any group.');
   });
@@ -46,7 +46,15 @@ exports.create = function (req, res, next) {
 
       group.save(function (err, createdGroup) {
         if (err) { return next(err); }
-        res.send(createdGroup.id);
+
+        if (createdGroup) {
+          const groupId = createdGroup.id.toString();
+          existingUser.groups.push({ id: groupId, isLeader: true });
+          existingUser.save(function (err, updatedUser) {
+            if (err) { return next(err); }
+            res.send(createdGroup.id);
+          });
+        }
       });
     }
   });
@@ -67,6 +75,14 @@ exports.inviteUser = function (req, res, next) {
       Group.findById(groupId, function (err, existingGroup) {
         if (err) { return next(err); }
 
+        if (!existingGroup) {
+          return next('Invalid group.');
+        }
+
+        if (leaderId !== existingGroup.leader.toString()) {
+          return next('You do not have permissions to invite.');
+        }
+
         if (
           existingGroup
           && !existingGroup.users.find(isModelInArray.call(this, newUserId))
@@ -85,7 +101,7 @@ exports.inviteUser = function (req, res, next) {
               return next(err);
             });
         } else {
-          return next('Invalid user or group.');
+          return next('User is already in the group.');
         }
       });
     }
@@ -96,7 +112,7 @@ exports.inviteUser = function (req, res, next) {
   TODO:
   refactor accept, decline, leave methods 
 */
-exports.accept = function(req, res, next) {
+exports.accept = function (req, res, next) {
   const groupId = req.body.group;
   const userId = req.user.id;
 
@@ -144,7 +160,7 @@ exports.accept = function(req, res, next) {
   TODO:
   refactor accept, decline, leave methods 
 */
-exports.decline = function(req, res, next) {
+exports.decline = function (req, res, next) {
   const groupId = req.body.group;
   const userId = req.user.id;
 
@@ -192,7 +208,7 @@ exports.decline = function(req, res, next) {
   TODO:
   refactor accept, decline, leave methods 
 */
-exports.leave = function(req, res, next) {
+exports.leave = function (req, res, next) {
   const groupId = req.body.group;
   const userId = req.user.id;
 
