@@ -8,7 +8,7 @@ import MessageInput from './message_input';
 class Chat extends Component {
   constructor(props) {
     super(props);
-    const groupId = "5a496a22384a411054209c1c";
+    const groupId = "5a4d3664d428d425e85a2b5f";
     this.socket = io.connect('http://localhost:3000');
     this.socket
       .on('connect', () => {

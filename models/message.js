@@ -7,6 +7,7 @@ const messageSchema = new Schema({
   gif: { type: Buffer, required: true },
   gifText: { type: String, required: true },
   user: { type: String, required: true },
+  username: { type: String, required: true },
   group: { type: String, required: true },
 });
 

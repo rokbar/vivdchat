@@ -2,6 +2,7 @@ const Group = require('../models/group');
 const Message = require('../models/message');
 const { isModelInArray } = require('../helpers/array');
 const { Types } = require('mongoose');
+const { map } = require('lodash');
 
 exports.getMessagesByGroup = function(req, res, next) {
   const groupId = req.params.id;
@@ -22,9 +23,14 @@ exports.getMessagesByGroup = function(req, res, next) {
         .sort( [['_id', -1]] )
         .exec(function(err, messages) {
           if (err) { return next(err); }
-      
+
+          const messagesWithTime = map(messages, (item) => {
+            const { id, text, gif, gifText, user, username, group } = item;
+            return { id, text, gif, gifText, user, username, group, time: item._id.getTimestamp() };
+          });
+    
           res.setHeader('Content-Type', 'application/json');
-          res.send(JSON.stringify(messages));
+          res.send(JSON.stringify({ name: existingGroup.name, messages: messagesWithTime }));
         });
       }
     }); 
@@ -54,6 +60,7 @@ exports.saveMessage = function(body, callback) {
     gifText,
     group,
     user: sub,
+    username,
   });
 
   message.save(function(err, createdMessage) {
