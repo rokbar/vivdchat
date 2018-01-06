@@ -1,9 +1,13 @@
 import axios from 'axios';
 import { browserHistory } from 'react-router';
-import { 
+import {
   AUTH_USER,
   UNAUTH_USER,
   AUTH_ERROR,
+  FETCH_GROUPS_BY_USER,
+  ACCEPT_INVITATION,
+  DECLINE_INVITATION,
+  LEAVE_GROUP,
   FETCH_MESSAGE,
   APPEND_MESSAGE,
   RECEIVE_MESSAGE
@@ -13,7 +17,7 @@ import {
 const ROOT_URL = 'http://localhost:3000';
 
 export function signinUser({ username, password }) {
-  return function(dispatch) {
+  return function (dispatch) {
     // Submit username/password to the server
     axios.post(`${ROOT_URL}/signin`, { username, password })
       .then(response => {
@@ -26,7 +30,7 @@ export function signinUser({ username, password }) {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('username', username);
         // - Redirect to the route '/'
-        browserHistory.push('/chat');
+        browserHistory.push('/groups');
       })
       .catch(() => {
         // If request is bad...
@@ -37,7 +41,7 @@ export function signinUser({ username, password }) {
 }
 
 export function signupUser({ username, password }) {
-  return function(dispatch) {
+  return function (dispatch) {
     axios.post(`${ROOT_URL}/signup`, { username, password })
       .then(response => {
         dispatch({
@@ -45,7 +49,7 @@ export function signupUser({ username, password }) {
         });
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('username', username);
-        browserHistory.push('/chat');
+        browserHistory.push('/groups');
       })
       .catch(error => {
         console.log(error);
@@ -68,19 +72,77 @@ export function signoutUser() {
   return { type: UNAUTH_USER };
 }
 
-export function fetchMessage() {
-  return function(dispatch) {
-    axios.get(ROOT_URL, {
-      headers: {authorization: localStorage.getItem('token' )}
+export function fetchGroupsByUser() {
+  return function (dispatch) {
+    axios.get(`${ROOT_URL}/groups`, {
+      headers: { authorization: localStorage.getItem('token') }
     })
       .then(response => {
         dispatch({
-          type: FETCH_MESSAGE,
-          payload: response.data.message
+          type: FETCH_GROUPS_BY_USER,
+          payload: response.data,
         });
       });
   }
 }
+
+export function acceptInvitation(group) {
+  return function (dispatch) {
+    axios.post(`${ROOT_URL}/groups/accept`,
+      { group },
+      { headers: { authorization: localStorage.getItem('token'), } }
+    )
+      .then(response => {
+        dispatch({
+          type: ACCEPT_INVITATION,
+          payload: response.data,
+        });
+      });
+  }
+}
+
+export function declineInvitation(group) {
+  return function (dispatch) {
+    axios.post(`${ROOT_URL}/groups/decline`,
+      { group },
+      { headers: { authorization: localStorage.getItem('token'), } }
+    )
+      .then(response => {
+        dispatch({
+          type: ACCEPT_INVITATION,
+          payload: response.data,
+        });
+      });
+  }
+}
+
+export function leaveGroup(group) {
+  return function (dispatch) {
+    axios.post(`${ROOT_URL}/groups/leave`,
+      { group },
+      { headers: { authorization: localStorage.getItem('token'), } }
+    )
+      .then(response => {
+        dispatch({
+          type: LEAVE_GROUP,
+          payload: response.data,
+        });
+      });
+  }
+}
+// export function fetchMessage() {
+//   return function(dispatch) {
+//     axios.get(ROOT_URL, {
+//       headers: {authorization: localStorage.getItem('token' )}
+//     })
+//       .then(response => {
+//         dispatch({
+//           type: FETCH_MESSAGE,
+//           payload: response.data.message
+//         });
+//       });
+//   }
+// }
 
 export function appendMessage(message) {
   return {

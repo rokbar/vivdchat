@@ -11,7 +11,7 @@ const groupSchema = new Schema({
     state: {
       type: Number,
       enum: Object.values(userGroupState),
-      default: userGroupState.UNACCEPTED,
+      defaut: userGroupState.UNACCEPTED,
     },
     _id: false,
   }],

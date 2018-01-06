@@ -8,7 +8,7 @@ const { map } = require('lodash');
 exports.getGroupsByUser = function (req, res, next) {
   const userId = req.user.id;
 
-  Group.find({ users: { id: userId } }, function (err, existingGroups) {
+  Group.find({ 'users.id': userId }, function (err, existingGroups) {
     if (err) { return next(err); }
 
     if (existingGroups.length) {
@@ -16,14 +16,17 @@ exports.getGroupsByUser = function (req, res, next) {
         const { id, name } = group;
         const leader = group.leader.valueOf();
         const user = group.users.find(isModelInArray.call(this, userId));
-        return { id, leader, name, user }
+        return user.state !== userGroupState.LEFT
+          || user.state !== userGroupState.DECLINED
+          ? { id, leader, name, user }
+          : false;
       });
 
       res.setHeader('Content-Type', 'application/json');
       res.send(JSON.stringify(polishedGroups));
+    } else {
+      return next('User does not belong to any group.');
     }
-
-    return next('User does not belong to any group.');
   });
 };
 
@@ -143,7 +146,7 @@ exports.accept = function (req, res, next) {
           return Promise.all([existingGroup.save(), existingUser.save()])
             .then(([updatedGroup, updatedUser]) => {
               res.setHeader('Content-Type', 'application/json');
-              res.send(JSON.stringify({ group: updatedGroup.id, user: updatedUser.id }));
+              res.send(JSON.stringify({ group: updatedGroup.id, user: updatedUser.id, state: userGroupState.ACCEPTED }));
             })
             .catch((err) => {
               return next(err);
@@ -191,7 +194,7 @@ exports.decline = function (req, res, next) {
           return Promise.all([existingGroup.save(), existingUser.save()])
             .then(([updatedGroup, updatedUser]) => {
               res.setHeader('Content-Type', 'application/json');
-              res.send(JSON.stringify({ group: updatedGroup.id, user: updatedUser.id }));
+              res.send(JSON.stringify({ group: updatedGroup.id, user: updatedUser.id, state: userGroupState.DECLINED }));
             })
             .catch((err) => {
               return next(err);
@@ -239,7 +242,7 @@ exports.leave = function (req, res, next) {
           return Promise.all([existingGroup.save(), existingUser.save()])
             .then(([updatedGroup, updatedUser]) => {
               res.setHeader('Content-Type', 'application/json');
-              res.send(JSON.stringify({ group: updatedGroup.id, user: updatedUser.id }));
+              res.send(JSON.stringify({ group: updatedGroup.id, user: updatedUser.id, state: userGroupState.LEFT }));
             })
             .catch((err) => {
               return next(err);
