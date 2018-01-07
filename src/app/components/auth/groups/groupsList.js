@@ -16,6 +16,7 @@ const GroupsList = (props) => {
     declineInvitation: props.declineInvitation,
     leaveGroup: props.leaveGroup,
     handleSubmit: props.handleSubmit,
+    handleOpenInviteUser: props.handleOpenInviteUser,
   };
   return (
     <Table selectable={false} style={{ minHeight: '200px' }} >
@@ -47,6 +48,7 @@ const getGroupsList = (groups, actions) => {
         declineInvitation={item.user.state === 0 ? actions.declineInvitation : undefined}
         leaveGroup={item.user.state === 1 ? actions.leaveGroup : undefined}
         handleSubmit={actions.handleSubmit}
+        handleOpenInviteUser={item.user.id === item.leader ? actions.handleOpenInviteUser : undefined}
       />
     });
   } else {

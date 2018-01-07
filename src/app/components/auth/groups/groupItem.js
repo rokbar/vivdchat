@@ -28,22 +28,15 @@ const GroupItem = (props) => {
     props.handleSubmit(props.id, props.leaveGroup);
   }
 
-  const handleInvite = (e) => {
-    e.preventDefault();
-    props.handleSubmit(group, user, props.inviteUser);
-  }
-
   const leaderActionButtons = () => {
     return (
       <div style={{ display: 'inline-flex' }}>
         <IconButton tooltip="Join chat" tooltipPosition="left">
           <ChatIcon />
         </IconButton>
-        <form method="post" onSubmit={(e) => handleInvite(e)}>
-          <IconButton tooltip="Invite user" tooltipPosition="left">
-            <InviteIcon />
-          </IconButton>
-        </form>
+        <IconButton onClick={() => props.handleOpenInviteUser(props.id)} tooltip="Invite user" tooltipPosition="left">
+          <InviteIcon />
+        </IconButton>
       </div>
     )
   };

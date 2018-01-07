@@ -7,7 +7,10 @@ exports.findByName = function(req, res, next) {
   .sort({ username: 1 })
   .select({ _id: 1, username: 1})
   .exec(function(err, users) {
-    if (err) { return next(err); }
+    if (err) {
+      console.log(err);
+      return res.status(400).send({ error: 'Unhandled API error.' }); 
+    }
 
     res.setHeader('Content-Type', 'application/json');
     res.send(JSON.stringify(users));

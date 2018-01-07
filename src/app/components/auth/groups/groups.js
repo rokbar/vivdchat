@@ -4,6 +4,7 @@ import { FlatButton } from 'material-ui';
 import CreateGroupIcon from 'material-ui/svg-icons/content/add-circle';
 import GroupsList from './groupsList';
 import CreateGroupDialog from './createGroupDialog';
+import InviteUserDialog from './inviteUserDialog';
 import {
   fetchGroupsByUser,
   acceptInvitation,
@@ -15,7 +16,9 @@ class Groups extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      open: false,
+      openCreateGroup: false,
+      openInviteUser: false,
+      selectedGroup: false,
     }
   }
 
@@ -23,20 +26,41 @@ class Groups extends Component {
     action(group);
   }
 
-  handleOpen = () => {
-    this.setState({ open: true });
+  handleOpenCreateGroup = () => {
+    this.setState({ openCreateGroup: true });
   }
 
-  handleClose = () => {
-    this.setState({ open: false });
+  handleCloseCreateGroup = () => {
+    this.setState({ openCreateGroup: false });
+  }
+
+  handleOpenInviteUser = (groupId) => {
+    this.setState({
+      openInviteUser: true,
+      selectedGroup: groupId,
+    });
+  }
+
+  handleCloseInviteUser = () => {
+    this.setState({ 
+      openInviteUser: false,
+      selectedGroup: false,
+    });
   }
 
   componentDidMount() {
     this.props.fetchGroupsByUser();
   }
 
+  componentWillUnmount() {
+    this.setState({ 
+      openInviteUser: false,
+      selectedGroup: false,
+    });
+  }
+
   render(props) {
-     return (
+    return (
       <div>
         <GroupsList
           acceptInvitation={this.props.acceptInvitation}
@@ -44,16 +68,23 @@ class Groups extends Component {
           leaveGroup={this.props.leaveGroup}
           handleSubmit={(group, action) => this.handleSubmit(group, action)}
           groups={this.props.groups}
+          handleOpenInviteUser={this.handleOpenInviteUser}
         />
         <FlatButton
           label="Create group"
           icon={<CreateGroupIcon />}
-          onClick={this.handleOpen}
+          onClick={this.handleOpenCreateGroup}
         />
         <CreateGroupDialog
-          handleOpen={this.handleOpen}
-          handleClose={this.handleClose}
-          open={this.state.open}
+          handleOpen={this.handleOpenCreateGroup}
+          handleClose={this.handleCloseCreateGroup}
+          open={this.state.openCreateGroup}
+        />
+        <InviteUserDialog
+          groupId={this.state.selectedGroup}
+          handleOpen={this.handleOpenInviteUser}
+          handleClose={this.handleCloseInviteUser}
+          open={this.state.openInviteUser}
         />
       </div>
     );

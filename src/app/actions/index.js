@@ -6,6 +6,7 @@ import {
   AUTH_ERROR,
   CREATE_NEW_GROUP,
   FETCH_GROUPS_BY_USER,
+  INVITE_USER,
   ACCEPT_INVITATION,
   DECLINE_INVITATION,
   LEAVE_GROUP,
@@ -74,7 +75,7 @@ export function signoutUser() {
   return { type: UNAUTH_USER };
 }
 
-export function createNewGroup({ name }, resolve) {
+export function createNewGroup({ name }, resolve, reject) {
   return function (dispatch) {
     axios.post(
       `${ROOT_URL}/groups/create`,
@@ -93,6 +94,7 @@ export function createNewGroup({ name }, resolve) {
       })
       .catch(error => {
         error.response && dispatch(apiError(error.response.data.error));
+        reject();
       });
   }
 }
@@ -108,6 +110,30 @@ export function fetchGroupsByUser() {
           payload: response.data,
         });
       });
+  }
+}
+
+export function inviteUser({ group, user }, resolve, reject) {
+  return function (dispatch) {
+    axios.post(
+      `${ROOT_URL}/groups/inviteUser`,
+      { group, user },
+      { headers: { authorization: localStorage.getItem('token'), } }
+    )
+    .then(response => {
+      dispatch({
+        type: CLEAR_ERROR,
+      });
+      dispatch({
+        type: INVITE_USER,
+        payload: response.data,
+      });
+      resolve();
+    })
+    .catch(error => {
+      error.response && dispatch(apiError(error.response.data.error));
+      reject();
+    });
   }
 }
 
