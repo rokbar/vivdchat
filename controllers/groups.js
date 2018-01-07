@@ -3,12 +3,12 @@ const User = require('../models/user');
 const Invitation = require('../models/invitation');
 const { userGroupState } = require('../models/enums');
 const { isModelInArray } = require('../helpers/array');
-const { map } = require('lodash');
+const { map, filter, isEmpty } = require('lodash');
 
 exports.getGroupsByUser = function (req, res, next) {
   const userId = req.user.id;
 
-  Group.find({ users: { id: userId } }, function (err, existingGroups) {
+  Group.find({ 'users.id': userId }, function (err, existingGroups) {
     if (err) { return next(err); }
 
     if (existingGroups.length) {
@@ -16,79 +16,117 @@ exports.getGroupsByUser = function (req, res, next) {
         const { id, name } = group;
         const leader = group.leader.valueOf();
         const user = group.users.find(isModelInArray.call(this, userId));
-        return { id, leader, name, user }
-      });
+        if (user.state !== userGroupState.LEFT && user.state !== userGroupState.DECLINED) {
+          return { id, leader, name, user };
+        }
+      })
+      const filteredGroups = filter(polishedGroups, (group) => !isEmpty(group));
 
       res.setHeader('Content-Type', 'application/json');
-      res.send(JSON.stringify(polishedGroups));
+      res.send(JSON.stringify(filteredGroups));
+    } else {
+      return next('User does not belong to any group.');
     }
-
-    return next('User does not belong to any group.');
   });
 };
 
 exports.create = function (req, res, next) {
   const userId = req.user.id;
-  const groupName = req.body.name;
+  const groupName = req.body.name.toString();
   const groupMembers = [];
 
-  User.findById(userId, function (error, existingUser) {
-    if (error) { return next(error) };
-
-    if (existingUser) {
-      groupMembers.push({ id: existingUser.id });
-
-      const group = new Group({
-        name: groupName,
-        leader: existingUser.id,
-        users: groupMembers,
-      });
-
-      group.save(function (err, createdGroup) {
-        if (err) { return next(err); }
-
-        if (createdGroup) {
-          const groupId = createdGroup.id.toString();
-          existingUser.groups.push({ id: groupId, isLeader: true });
-          existingUser.save(function (err, updatedUser) {
-            if (err) { return next(err); }
-            res.send(createdGroup.id);
+  Group.find({ name: groupName }, function(error, existingGroup) {
+    if (error) {
+      console.log(error);
+      return res.status(400).send({ error: 'Unhandled API error.' }); 
+    };
+    if (existingGroup.length !== 0) {
+      return res.status(422).send({ error: 'Group name is already taken.' });
+    } else {
+      User.findById(userId, function (error, existingUser) {
+        if (error) {
+          console.log(error);
+          return res.status(400).send({ error: 'Unhandled API error.' });
+        };
+    
+        if (existingUser) {
+          const createdGroupsByUser = filter(existingUser.groups, (item) => (item.isLeader === true)).length;
+          if (createdGroupsByUser >= 1) {
+            return res.status(422).send({ error: 'User can create only 1 group.' });
+          }
+    
+          groupMembers.push({ id: existingUser.id });
+    
+          const group = new Group({
+            name: req.body.name,
+            leader: existingUser.id,
+            users: groupMembers,
+          });
+    
+          group.save(function (err, createdGroup) {
+            if (err) {
+              console.log(err);
+              return res.status(400).send({ error: 'Unhandled API error.' }); 
+            }
+    
+            if (createdGroup) {
+              const groupId = createdGroup.id.toString();
+              const { id, leader, name } = createdGroup;
+              existingUser.groups.push({ id: groupId, isLeader: true });
+              existingUser.save(function (err, updatedUser) {
+                if (err) {
+                  console.log(err);
+                  return res.status(400).send({ error: 'Unhandled API error.' }); 
+                }
+                res.send({ 
+                  id, leader, name, user: { id: updatedUser.id, state: 0 } }
+                );
+              });
+            }
           });
         }
       });
     }
-  });
+  }); 
 };
 
 exports.inviteUser = function (req, res, next) {
   const leaderId = req.user.id;
-  const newUserId = req.body.user;
+  const newUser = req.body.user;
   const groupId = req.body.group;
 
-  User.findById(newUserId, function (err, existingUser) {
-    if (err) { return next(err); }
-    if (newUserId === leaderId) {
-      return next('Invalid user: selected user is group leader.');
+  User.findOne({ username: newUser }, function (err, existingUser) {
+    if (err) {
+      console.log(err);
+      return res.status(400).send({ error: 'Unhandled API error.' }); 
     }
 
     if (existingUser) {
+      const userId = existingUser.id.toString();
+      if (userId === leaderId) {
+        return res.status(422).send({ error: 'Invalid user: selected user is group leader.' }); 
+      }
+
       Group.findById(groupId, function (err, existingGroup) {
-        if (err) { return next(err); }
+        if (err) {
+          console.log(err);
+          return res.status(400).send({ error: 'Unhandled API error.' }); 
+        }
 
         if (!existingGroup) {
-          return next('Invalid group.');
+          return res.status(422).send({ error: 'Invalid group.' }); 
         }
 
         if (leaderId !== existingGroup.leader.toString()) {
-          return next('You do not have permissions to invite.');
+          return res.status(422).send({ error: 'You do not have permissions to invite.' }); 
         }
 
         if (
           existingGroup
-          && !existingGroup.users.find(isModelInArray.call(this, newUserId))
+          && !existingGroup.users.find(isModelInArray.call(this, userId))
           && !existingUser.groups.find(isModelInArray.call(this, groupId))
         ) {
-          existingGroup.users.push({ id: newUserId });
+          existingGroup.users.push({ id: userId });
           existingUser.groups.push({ id: groupId });
 
           // TODO: move Promise.all block DRY
@@ -98,12 +136,17 @@ exports.inviteUser = function (req, res, next) {
               res.send(JSON.stringify({ group: updatedGroup.id, user: updatedUser.id }));
             })
             .catch((err) => {
-              return next(err);
+              if (err) {
+                console.log(err);
+                return res.status(400).send({ error: 'Unhandled API error.' }); 
+              }
             });
         } else {
-          return next('User is already in the group.');
+          return res.status(422).send({ error: 'User is already in the group.' }); 
         }
       });
+    } else {
+      return res.status(422).send({ error: 'Could not find user with specified name.' }); 
     }
   });
 };
@@ -143,7 +186,7 @@ exports.accept = function (req, res, next) {
           return Promise.all([existingGroup.save(), existingUser.save()])
             .then(([updatedGroup, updatedUser]) => {
               res.setHeader('Content-Type', 'application/json');
-              res.send(JSON.stringify({ group: updatedGroup.id, user: updatedUser.id }));
+              res.send(JSON.stringify({ group: updatedGroup.id, user: updatedUser.id, state: userGroupState.ACCEPTED }));
             })
             .catch((err) => {
               return next(err);
@@ -191,7 +234,7 @@ exports.decline = function (req, res, next) {
           return Promise.all([existingGroup.save(), existingUser.save()])
             .then(([updatedGroup, updatedUser]) => {
               res.setHeader('Content-Type', 'application/json');
-              res.send(JSON.stringify({ group: updatedGroup.id, user: updatedUser.id }));
+              res.send(JSON.stringify({ group: updatedGroup.id, user: updatedUser.id, state: userGroupState.DECLINED }));
             })
             .catch((err) => {
               return next(err);
@@ -239,7 +282,7 @@ exports.leave = function (req, res, next) {
           return Promise.all([existingGroup.save(), existingUser.save()])
             .then(([updatedGroup, updatedUser]) => {
               res.setHeader('Content-Type', 'application/json');
-              res.send(JSON.stringify({ group: updatedGroup.id, user: updatedUser.id }));
+              res.send(JSON.stringify({ group: updatedGroup.id, user: updatedUser.id, state: userGroupState.LEFT }));
             })
             .catch((err) => {
               return next(err);

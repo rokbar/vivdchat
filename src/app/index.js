@@ -9,6 +9,7 @@ import App from './components/app';
 import Signin from './components/auth/signin';
 import Signout from './components/auth/signout';
 import Signup from './components/auth/signup';
+import Groups from './components/auth/groups/groups';
 import Chat from './components/auth/chat/chat';
 import RequireAuth from './components/auth/require_auth';
 import Welcome from './components/welcome';
@@ -31,7 +32,8 @@ ReactDOM.render(
         <Route path="signin" component={Signin} />
         <Route path="signout" component={Signout} />
         <Route path="signup" component={Signup} />
-        <Route path="chat" component={RequireAuth(Chat)} />
+        <Route path="groups" component={RequireAuth(Groups)} />
+        <Route path="chat/:groupId" component={RequireAuth(Chat)} />
       </Route>
     </Router>
   </Provider>

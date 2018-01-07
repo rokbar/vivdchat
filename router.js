@@ -9,9 +9,6 @@ const requireAuth = passport.authenticate('jwt', { session: false, failureRedire
 const requireSignin = passport.authenticate('local', { session: false });
 
 module.exports = function(app) {
-  app.get('/', requireAuth, function(req, res) {
-    res.send({ message: 'Authorized' });
-  });
   app.post('/signup', Authentication.signup);
   app.post('/signin', requireSignin, Authentication.signin);
   app.post('/users/search', requireAuth, Users.findByName);
