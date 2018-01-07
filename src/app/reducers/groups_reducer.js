@@ -1,4 +1,5 @@
 import {
+  CREATE_NEW_GROUP,
   FETCH_GROUPS_BY_USER,
   ACCEPT_INVITATION,
   DECLINE_INVITATION,
@@ -8,6 +9,8 @@ import { map, find } from 'lodash';
 
 export default function (state = [], action) {
   switch (action.type) {
+    case CREATE_NEW_GROUP:
+      return [...state, action.payload];
     case FETCH_GROUPS_BY_USER:
       return action.payload;
     case ACCEPT_INVITATION:
@@ -22,7 +25,6 @@ export default function (state = [], action) {
 }
 
 function updateStateAfterAction(state, { payload }) {
-  console.log(payload);
   const {group, user } = payload;
   const newState = payload.state;
 

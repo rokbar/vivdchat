@@ -4,14 +4,14 @@ const ObjectId = Schema.Types.ObjectId;
 const { userGroupState } = require('./enums');
 
 const groupSchema = new Schema({
-  name: { type: String, required: true },
+  name: { type: String, required: true, unique: true },
   leader: { type: ObjectId, required: true },
   users: [{ 
     id: ObjectId,
     state: {
       type: Number,
       enum: Object.values(userGroupState),
-      defaut: userGroupState.UNACCEPTED,
+      default: userGroupState.UNACCEPTED,
     },
     _id: false,
   }],

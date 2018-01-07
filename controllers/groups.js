@@ -3,7 +3,7 @@ const User = require('../models/user');
 const Invitation = require('../models/invitation');
 const { userGroupState } = require('../models/enums');
 const { isModelInArray } = require('../helpers/array');
-const { map } = require('lodash');
+const { map, filter, isEmpty } = require('lodash');
 
 exports.getGroupsByUser = function (req, res, next) {
   const userId = req.user.id;
@@ -16,14 +16,14 @@ exports.getGroupsByUser = function (req, res, next) {
         const { id, name } = group;
         const leader = group.leader.valueOf();
         const user = group.users.find(isModelInArray.call(this, userId));
-        return user.state !== userGroupState.LEFT
-          || user.state !== userGroupState.DECLINED
-          ? { id, leader, name, user }
-          : false;
-      });
+        if (user.state !== userGroupState.LEFT && user.state !== userGroupState.DECLINED) {
+          return { id, leader, name, user };
+        }
+      })
+      const filteredGroups = filter(polishedGroups, (group) => !isEmpty(group));
 
       res.setHeader('Content-Type', 'application/json');
-      res.send(JSON.stringify(polishedGroups));
+      res.send(JSON.stringify(filteredGroups));
     } else {
       return next('User does not belong to any group.');
     }
@@ -32,35 +32,62 @@ exports.getGroupsByUser = function (req, res, next) {
 
 exports.create = function (req, res, next) {
   const userId = req.user.id;
-  const groupName = req.body.name;
+  const groupName = req.body.name.toString();
   const groupMembers = [];
 
-  User.findById(userId, function (error, existingUser) {
-    if (error) { return next(error) };
-
-    if (existingUser) {
-      groupMembers.push({ id: existingUser.id });
-
-      const group = new Group({
-        name: groupName,
-        leader: existingUser.id,
-        users: groupMembers,
-      });
-
-      group.save(function (err, createdGroup) {
-        if (err) { return next(err); }
-
-        if (createdGroup) {
-          const groupId = createdGroup.id.toString();
-          existingUser.groups.push({ id: groupId, isLeader: true });
-          existingUser.save(function (err, updatedUser) {
-            if (err) { return next(err); }
-            res.send(createdGroup.id);
+  Group.find({ name: groupName }, function(error, existingGroup) {
+    if (error) {
+      console.log(error);
+      return res.status(400).send({ error: 'Unhandled API error.' }); 
+    };
+    if (existingGroup.length !== 0) {
+      return res.status(422).send({ error: 'Group name is already taken.' });
+    } else {
+      User.findById(userId, function (error, existingUser) {
+        if (error) {
+          console.log(error);
+          return res.status(400).send({ error: 'Unhandled API error.' });
+        };
+    
+        if (existingUser) {
+          const createdGroupsByUser = filter(existingUser.groups, (item) => (item.isLeader === true)).length;
+          if (createdGroupsByUser < 0) {
+            return res.status(422).send({ error: 'User can create only 1 group.' });
+          }
+    
+          groupMembers.push({ id: existingUser.id });
+    
+          const group = new Group({
+            name: req.body.name,
+            leader: existingUser.id,
+            users: groupMembers,
+          });
+    
+          group.save(function (err, createdGroup) {
+            if (err) {
+              console.log(err);
+              return res.status(400).send({ error: 'Unhandled API error.' }); 
+            }
+    
+            if (createdGroup) {
+              const groupId = createdGroup.id.toString();
+              const { id, leader, name } = createdGroup;
+              existingUser.groups.push({ id: groupId, isLeader: true });
+              existingUser.save(function (err, updatedUser) {
+                if (err) {
+                  console.log(err);
+                  return res.status(400).send({ error: 'Unhandled API error.' }); 
+                }
+                res.send({ 
+                  id, leader, name, user: { id: updatedUser.id, state: 0 } }
+                );
+              });
+            }
           });
         }
       });
     }
-  });
+  }); 
 };
 
 exports.inviteUser = function (req, res, next) {

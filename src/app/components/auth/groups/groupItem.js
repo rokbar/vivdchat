@@ -8,6 +8,7 @@ import AcceptIcon from 'material-ui/svg-icons/action/check-circle';
 import CancelIcon from 'material-ui/svg-icons/navigation/cancel';
 import ChatIcon from 'material-ui/svg-icons/communication/chat';
 import LeaveIcon from 'material-ui/svg-icons/content/remove-circle';
+import InviteIcon from 'material-ui/svg-icons/social/person-add';
 import enumState from './enumState';
 import { map } from 'lodash';
 
@@ -27,12 +28,22 @@ const GroupItem = (props) => {
     props.handleSubmit(props.id, props.leaveGroup);
   }
 
+  const handleInvite = (e) => {
+    e.preventDefault();
+    props.handleSubmit(group, user, props.inviteUser);
+  }
+
   const leaderActionButtons = () => {
     return (
-      <div>
-        <IconButton tooltip="Join chat" tooltipPosition="right">
+      <div style={{ display: 'inline-flex' }}>
+        <IconButton tooltip="Join chat" tooltipPosition="left">
           <ChatIcon />
         </IconButton>
+        <form method="post" onSubmit={(e) => handleInvite(e)}>
+          <IconButton tooltip="Invite user" tooltipPosition="left">
+            <InviteIcon />
+          </IconButton>
+        </form>
       </div>
     )
   };
@@ -41,14 +52,14 @@ const GroupItem = (props) => {
     switch (state) {
       case 0:
         return (
-          <div>
+          <div style={{ display: 'inline-flex' }}>
             <form method="post" onSubmit={(e) => handleAccept(e)}>
-              <IconButton type="submit" tooltip="Accept invitation" tooltipPosition="right">
+              <IconButton type="submit" tooltip="Accept invitation" tooltipPosition="left">
                 <AcceptIcon />
               </IconButton>
             </form>
             <form method="post" onSubmit={(e) => handleDecline(e)}>
-              <IconButton type="submit" tooltip="Decline invitation" tooltipPosition="right">
+              <IconButton type="submit" tooltip="Decline invitation" tooltipPosition="left">
                 <CancelIcon />
               </IconButton>
             </form>
@@ -56,12 +67,12 @@ const GroupItem = (props) => {
         );
       case 1:
         return (
-          <div>
+          <div style={{ display: 'inline-flex' }}>
             <IconButton tooltip="Join chat" tooltipPosition="right">
               <ChatIcon />
             </IconButton>
             <form method="post" onSubmit={(e) => handleLeave(e)}>
-              <IconButton type="submit" tooltip="Leave group" tooltipPosition="right">
+              <IconButton type="submit" tooltip="Leave group" tooltipPosition="left">
                 <LeaveIcon />
               </IconButton>
             </form>
@@ -84,9 +95,11 @@ const GroupItem = (props) => {
 
   return (
     <TableRow>
-      <TableRowColumn>{props.name}</TableRowColumn>
-      <TableRowColumn>{enumState[props.user.state]}</TableRowColumn>
-      <TableRowColumn>
+      <TableRowColumn style={{ textAlign: 'center' }}>{props.name}</TableRowColumn>
+      <TableRowColumn style={{ textAlign: 'center' }}>
+        {props.user.id === props.leader ? <div>You are group leader</div> : enumState[props.user.state] }
+      </TableRowColumn>
+      <TableRowColumn style={{ textAlign: 'center' }}>
         {props.user.id === props.leader ? leaderActionButtons() : actionButtons(props.user.state)}
       </TableRowColumn>
     </TableRow>

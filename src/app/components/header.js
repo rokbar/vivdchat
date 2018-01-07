@@ -42,7 +42,7 @@ class Header extends Component {
   render() {   
     return (
       <AppBar 
-        title={<Link style={styles.title} to="/chat">Vivdchat</Link>}
+        title={<Link style={styles.title} to="/groups">Vivdchat</Link>}
         iconElementLeft={<br/>}
         iconElementRight={this.props.authenticated ? <Logged /> : <Login />}
       />
