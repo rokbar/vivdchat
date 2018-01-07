@@ -6,9 +6,14 @@ import {
   Paper, 
 } from 'material-ui';
 import moment from 'moment';
+import base64js from 'base64-js';
+import { isArray } from 'lodash';
 
 const MessageList = (props) => {
   const messageItems = props.messages.map((message, index) => {
+    const gif = isArray(message.gif) 
+    ? `data:image/gif;base64,${base64js.fromByteArray(message.gif)}`
+    : message.gif;
     const time = moment(message.time).local().calendar();
     return (
       <ListItem
@@ -16,7 +21,7 @@ const MessageList = (props) => {
         children={
           <div>
             <span>{time}</span>
-            <img src={message.gif} />
+            <img src={gif} />
             <span>
               &nbsp;<span style={styles.username}>{message.username}:</span>
               &nbsp;{message.text}

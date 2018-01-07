@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { receiveMessage } from '../../../actions';
+import { receiveMessage, fetchMessagesByGroup } from '../../../actions';
 import io from 'socket.io-client';
 import MessageList from './message_list';
 import MessageInput from './message_input';
@@ -8,8 +8,7 @@ import MessageInput from './message_input';
 class Chat extends Component {
   constructor(props) {
     super(props);
-    const groupId = props.match.params.groupId;
-    console.log('groupId' + groupId);
+    const groupId = props.routeParams.groupId;
     this.socket = io.connect('http://localhost:3000');
     this.socket
       .on('connect', () => {
@@ -34,6 +33,10 @@ class Chat extends Component {
 
   updateChatFromSockets(message) {
     this.props.receiveMessage(message);
+  }
+
+  componentDidMount() {
+    this.props.fetchMessagesByGroup(this.props.routeParams.groupId);
   }
 
   componentDidUpdate() {
@@ -64,4 +67,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, { receiveMessage })(Chat);
+export default connect(mapStateToProps, { receiveMessage, fetchMessagesByGroup })(Chat);

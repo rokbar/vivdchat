@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "axios": "^0.15.3",
+    "base64-js": "^1.2.1",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.17.1",
     "cors": "^2.8.1",

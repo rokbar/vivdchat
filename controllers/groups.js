@@ -9,7 +9,10 @@ exports.getGroupsByUser = function (req, res, next) {
   const userId = req.user.id;
 
   Group.find({ 'users.id': userId }, function (err, existingGroups) {
-    if (err) { return next(err); }
+    if (err) {
+      console.log(err);
+      return res.status(400).send({ error: 'Unhandled API error.' }); 
+    };
 
     if (existingGroups.length) {
       const polishedGroups = map(existingGroups, (group) => {
@@ -25,7 +28,7 @@ exports.getGroupsByUser = function (req, res, next) {
       res.setHeader('Content-Type', 'application/json');
       res.send(JSON.stringify(filteredGroups));
     } else {
-      return next('User does not belong to any group.');
+      return res.status(422).send({ error: 'User does not belong to any group.' }); 
     }
   });
 };
@@ -160,11 +163,17 @@ exports.accept = function (req, res, next) {
   const userId = req.user.id;
 
   User.findById(userId, function (err, existingUser) {
-    if (err) { return next(err); }
+    if (err) {
+      console.log(err);
+      return res.status(400).send({ error: 'Unhandled API error.' }); 
+    };
 
     if (existingUser) {
       Group.findById(groupId, function (err, existingGroup) {
-        if (err) { return next(err); }
+        if (err) {
+          console.log(err);
+          return res.status(400).send({ error: 'Unhandled API error.' }); 
+        };
 
         let userInGroup = existingGroup.users.find(isModelInArray.call(this, userId));
         let groupInUser = existingUser.groups.find(isModelInArray.call(this, groupId));
@@ -175,7 +184,7 @@ exports.accept = function (req, res, next) {
           && groupInUser
         ) {
           if (userInGroup.state === userGroupState.ACCEPTED && groupInUser.state === userGroupState.ACCEPTED) {
-            return next('Already accepted.');
+            return res.status(422).send({ error: 'Already accepted.' });
           }
 
           if (userInGroup.state === userGroupState.UNACCEPTED || groupInUser.state === userGroupState.UNACCEPTED) {
@@ -189,10 +198,11 @@ exports.accept = function (req, res, next) {
               res.send(JSON.stringify({ group: updatedGroup.id, user: updatedUser.id, state: userGroupState.ACCEPTED }));
             })
             .catch((err) => {
-              return next(err);
+              console.log(err);
+              return res.status(400).send({ error: 'Unhandled API error.' });
             });
         } else {
-          return next('Invalid user or group.');
+          return res.status(422).send({ error: 'Invalid user or group.' });
         }
       });
     }
@@ -208,11 +218,17 @@ exports.decline = function (req, res, next) {
   const userId = req.user.id;
 
   User.findById(userId, function (err, existingUser) {
-    if (err) { return next(err); }
+    if (err) { 
+      console.log(err);
+      return res.status(400).send({ error: 'Unhandled API error.' }); 
+    }
 
     if (existingUser) {
       Group.findById(groupId, function (err, existingGroup) {
-        if (err) { return next(err); }
+        if (err) { 
+          console.log(err);
+          return res.status(400).send({ error: 'Unhandled API error.' }); 
+        }
 
         let userInGroup = existingGroup.users.find(isModelInArray.call(this, userId));
         let groupInUser = existingUser.groups.find(isModelInArray.call(this, groupId));
@@ -223,7 +239,7 @@ exports.decline = function (req, res, next) {
           && groupInUser
         ) {
           if (userInGroup.state === userGroupState.DECLINED && groupInUser.state === userGroupState.DECLINED) {
-            return next('Already declined.');
+            return res.status(422).send({ error: 'Already declined.' });
           }
 
           if (userInGroup.state === userGroupState.UNACCEPTED || groupInUser.state === userGroupState.UNACCEPTED) {
@@ -237,10 +253,11 @@ exports.decline = function (req, res, next) {
               res.send(JSON.stringify({ group: updatedGroup.id, user: updatedUser.id, state: userGroupState.DECLINED }));
             })
             .catch((err) => {
-              return next(err);
+              console.log(err);
+              return res.status(400).send({ error: 'Unhandled API error.' });
             });
         } else {
-          return next('Invalid user or group.');
+          return res.status(422).send({ error: 'Invalid user or group.' });
         }
       });
     }
@@ -256,11 +273,17 @@ exports.leave = function (req, res, next) {
   const userId = req.user.id;
 
   User.findById(userId, function (err, existingUser) {
-    if (err) { return next(err); }
+    if (err) { 
+      console.log(err);
+      return res.status(400).send({ error: 'Unhandled API error.' }); 
+    }
 
     if (existingUser) {
       Group.findById(groupId, function (err, existingGroup) {
-        if (err) { return next(err); }
+        if (err) {
+          console.log(err);
+          return res.status(400).send({ error: 'Unhandled API error.' }); 
+        }
 
         let userInGroup = existingGroup.users.find(isModelInArray.call(this, userId));
         let groupInUser = existingUser.groups.find(isModelInArray.call(this, groupId));
@@ -271,7 +294,7 @@ exports.leave = function (req, res, next) {
           && groupInUser
         ) {
           if (userInGroup.state === userGroupState.LEFT && groupInUser.state === userGroupState.LEFT) {
-            return next('Already left the group.');
+            return res.status(422).send({ error: 'Already left the group.' });
           }
 
           if (userInGroup.state === userGroupState.ACCEPTED || groupInUser.state === userGroupState.ACCEPTED) {
@@ -285,10 +308,11 @@ exports.leave = function (req, res, next) {
               res.send(JSON.stringify({ group: updatedGroup.id, user: updatedUser.id, state: userGroupState.LEFT }));
             })
             .catch((err) => {
-              return next(err);
+              console.log(err);
+              return res.status(400).send({ error: 'Unhandled API error.' });
             });
         } else {
-          return next('Invalid user or group.');
+          return res.status(422).send({ error: 'Invalid user or group.' });
         }
       });
     }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router';
 import {
   TableRow,
   TableRowColumn
@@ -31,7 +32,7 @@ const GroupItem = (props) => {
   const leaderActionButtons = () => {
     return (
       <div style={{ display: 'inline-flex' }}>
-        <IconButton tooltip="Join chat" tooltipPosition="left">
+        <IconButton containerElement={<Link to={`/chat/${props.id}`} />} tooltip="Join chat" tooltipPosition="left">
           <ChatIcon />
         </IconButton>
         <IconButton onClick={() => props.handleOpenInviteUser(props.id)} tooltip="Invite user" tooltipPosition="left">
@@ -61,7 +62,7 @@ const GroupItem = (props) => {
       case 1:
         return (
           <div style={{ display: 'inline-flex' }}>
-            <IconButton tooltip="Join chat" tooltipPosition="right">
+            <IconButton containerElement={<Link to={`/chat/${props.id}`} />} tooltip="Join chat" tooltipPosition="right">
               <ChatIcon />
             </IconButton>
             <form method="post" onSubmit={(e) => handleLeave(e)}>

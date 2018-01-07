@@ -11,6 +11,7 @@ import {
   DECLINE_INVITATION,
   LEAVE_GROUP,
   FETCH_MESSAGE,
+  FETCH_GROUP_MESSAGES,
   APPEND_MESSAGE,
   RECEIVE_MESSAGE,
   API_ERROR,
@@ -181,6 +182,20 @@ export function leaveGroup(group) {
           type: LEAVE_GROUP,
           payload: response.data,
         });
+      });
+  }
+}
+
+export function fetchMessagesByGroup(group) {
+  return function (dispatch) {
+    axios.get(`${ROOT_URL}/groups/${group}`, {
+      headers: { authorization: localStorage.getItem('token') }
+    })
+      .then(response => {
+        dispatch({
+          type: FETCH_GROUP_MESSAGES,
+          payload: response.data.messages,
+        })
       });
   }
 }

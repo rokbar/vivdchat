@@ -4,7 +4,7 @@ const ObjectId = Schema.Types.ObjectId;
 
 const messageSchema = new Schema({
   text: { type: String, required: true },
-  gif: { type: Buffer, required: true },
+  gif: { type: [Number], required: true },
   gifText: { type: String, required: true },
   user: { type: String, required: true },
   username: { type: String, required: true },

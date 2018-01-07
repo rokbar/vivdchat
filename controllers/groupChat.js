@@ -3,6 +3,7 @@ const Message = require('../models/message');
 const { isModelInArray } = require('../helpers/array');
 const { Types } = require('mongoose');
 const { map } = require('lodash');
+const base64js = require('base64-js');
 
 exports.getMessagesByGroup = function(req, res, next) {
   const groupId = req.params.id;
@@ -10,19 +11,25 @@ exports.getMessagesByGroup = function(req, res, next) {
 
   if (Types.ObjectId.isValid(groupId)) {
     Group.findById(groupId, function(err, existingGroup) {
-      if (err) { return next(err); }
+      if (err) {
+        console.log(err);
+        return res.status(400).send({ error: 'Unhandled API error.' }); 
+      }
   
       if (!existingGroup) {
-        return next('Invalid group.');
+        res.status(422).send({ error: 'Invalid group.' });
       }
   
       if (!existingGroup.users.find(isModelInArray.call(this, userId))) {
-        return next('User does not belong to group');
+        res.status(422).send({ error: 'User does not belong to any group.' });
       } else {
         Message.find({ group: groupId })
         .sort( [['_id', -1]] )
         .exec(function(err, messages) {
-          if (err) { return next(err); }
+          if (err) {
+            console.log(err);
+            return res.status(400).send({ error: 'Unhandled API error.' }); 
+          }
 
           const messagesWithTime = map(messages, (item) => {
             const { id, text, gif, gifText, user, username, group } = item;
@@ -56,7 +63,7 @@ exports.saveMessage = function(body, callback) {
 
   const message = new Message({
     text,
-    gif,
+    gif: Array.from(base64js.toByteArray(gif.substring(22))),
     gifText,
     group,
     user: sub,
@@ -83,8 +90,8 @@ exports.deleteUserMessagesByGroup = function(req, res, next) {
 
   Message.remove({ group: groupId, user: userId }, function(err) {
     if (err) {
-      res.send({ error: err });
-      return next(err);
+      console.log(err);
+      return res.status(400).send({ error: 'Unhandled API error.' }); 
     } else {
       res.send({ message: 'user\'s ' + userId + ' messages are deleted from group ' + groupId });
     }

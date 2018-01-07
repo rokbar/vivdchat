@@ -8,6 +8,7 @@ import {
   LinearProgress,
 } from 'material-ui';
 import MessageIcon from 'material-ui/svg-icons/communication/message';
+import base64js from 'base64-js';
 
 class MessageInput extends Component {
   constructor(props) {
@@ -43,6 +44,10 @@ class MessageInput extends Component {
       fontSize: '20px',
       gifWidth: '150',
       gifHeight: '150',
+      interval: '0.5',
+      numFrames: 30,
+      frameDuration: '0.3',
+      sampleInterval: '500',
       progressCallback: (captureProgress) => {
         this.setState({ completed: captureProgress * 100 });
         document.querySelector("button").disabled = true;
@@ -61,11 +66,13 @@ class MessageInput extends Component {
           gifText: this.state.gifText,
         }
 
+        console.log(base64js.toByteArray(this.state.gif.substring(22)));
+
         this.props.appendMessage({
            ...message,
            username: localStorage.getItem('username'),
            time: Date.now(),
-        });
+        });;
 
         this.socket.emit('send message', message);
         this.setState({ messageText: '', gifText: '' });
