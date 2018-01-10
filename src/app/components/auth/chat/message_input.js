@@ -42,11 +42,8 @@ class MessageInput extends Component {
       text: this.state.gifText,
       fontWeight: 'bold',
       fontSize: '20px',
-      gifWidth: '150',
-      gifHeight: '150',
-      interval: '0.5',
-      numFrames: 30,
-      frameDuration: '0.3',
+      gifWidth: '120',
+      gifHeight: '120',
       sampleInterval: '500',
       progressCallback: (captureProgress) => {
         this.setState({ completed: captureProgress * 100 });
@@ -65,9 +62,7 @@ class MessageInput extends Component {
           gif: this.state.gif,
           gifText: this.state.gifText,
         }
-
-        console.log(base64js.toByteArray(this.state.gif.substring(22)));
-
+        
         this.props.appendMessage({
            ...message,
            username: localStorage.getItem('username'),

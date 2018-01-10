@@ -4,6 +4,7 @@ import { receiveMessage, fetchMessagesByGroup } from '../../../actions';
 import io from 'socket.io-client';
 import MessageList from './message_list';
 import MessageInput from './message_input';
+import { BottomNavigation } from 'material-ui';
 
 class Chat extends Component {
   constructor(props) {
@@ -50,12 +51,12 @@ class Chat extends Component {
   render() {
     return (
       <div>
-        <div id="messages">
-          <MessageList messages={this.props.messages} />
+        <div style={{height: '85vh'}} id="messages">
+          <MessageList messages={this.props.messages} groupName={this.props.groupName} />
         </div>
-        <div id="inputs">
+        <BottomNavigation styles={{height: '120px'}} id="inputs">
           <MessageInput socket={this.socket} />
-        </div>
+        </ BottomNavigation>
       </div>
     );
   }
@@ -63,7 +64,8 @@ class Chat extends Component {
 
 function mapStateToProps(state) {
   return {
-    messages: state.messages
+    messages: state.messages,
+    groupName: state.groupName,
   };
 }
 

@@ -11,6 +11,7 @@ import {
   DECLINE_INVITATION,
   LEAVE_GROUP,
   FETCH_MESSAGE,
+  FETCH_GROUP_NAME,
   FETCH_GROUP_MESSAGES,
   APPEND_MESSAGE,
   RECEIVE_MESSAGE,
@@ -195,7 +196,11 @@ export function fetchMessagesByGroup(group) {
         dispatch({
           type: FETCH_GROUP_MESSAGES,
           payload: response.data.messages,
-        })
+        });
+        dispatch({
+          type: FETCH_GROUP_NAME,
+          payload: response.data.name,
+        });
       });
   }
 }
