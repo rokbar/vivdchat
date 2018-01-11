@@ -3,9 +3,9 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 
 const messageSchema = new Schema({
-  text: { type: String, required: true },
-  gif: { type: [Number], required: true },
-  gifText: { type: String, required: true },
+  text: { type: String },
+  gif: { type: [Number] },
+  gifText: { type: String },
   user: { type: String, required: true },
   username: { type: String, required: true },
   group: { type: String, required: true },

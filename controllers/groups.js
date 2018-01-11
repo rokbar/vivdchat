@@ -124,15 +124,35 @@ exports.inviteUser = function (req, res, next) {
           return res.status(422).send({ error: 'You do not have permissions to invite.' }); 
         }
 
+        const userInGroup = existingGroup.users.find(isModelInArray.call(this, userId));
+        const groupInUser = existingUser.groups.find(isModelInArray.call(this, groupId));
         if (
           existingGroup
-          && !existingGroup.users.find(isModelInArray.call(this, userId))
-          && !existingUser.groups.find(isModelInArray.call(this, groupId))
+          && !userInGroup
+          && !groupInUser
         ) {
           existingGroup.users.push({ id: userId });
           existingUser.groups.push({ id: groupId });
 
           // TODO: move Promise.all block DRY
+          return Promise.all([existingGroup.save(), existingUser.save()])
+            .then(([updatedGroup, updatedUser]) => {
+              res.setHeader('Content-Type', 'application/json');
+              res.send(JSON.stringify({ group: updatedGroup.id, user: updatedUser.id }));
+            })
+            .catch((err) => {
+              if (err) {
+                console.log(err);
+                return res.status(400).send({ error: 'Unhandled API error.' }); 
+              }
+            });
+        } else if (
+          existingGroup
+          && (userInGroup.state === userGroupState.DECLINED || userInGroup.state === userGroupState.LEFT)
+        ) {
+          userInGroup.state = userGroupState.UNACCEPTED;
+          groupInUser.state = userGroupState.UNACCEPTED;
+
           return Promise.all([existingGroup.save(), existingUser.save()])
             .then(([updatedGroup, updatedUser]) => {
               res.setHeader('Content-Type', 'application/json');

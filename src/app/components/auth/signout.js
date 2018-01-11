@@ -8,7 +8,11 @@ class Signout extends Component {
   }
 
   render() {
-    return <div>Sorry to see you go...</div>;
+    return (
+      <div style={{ height: '60%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+        Sorry to see you go...
+    </div>
+    );
   }
 }
 

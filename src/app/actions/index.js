@@ -211,6 +211,10 @@ export function fetchMessagesByGroup(group) {
           type: FETCH_GROUP_NAME,
           payload: response.data.name,
         });
+      })
+      .catch((err) => {
+        console.log(err);
+        browserHistory.push('/groups');
       });
   }
 }
