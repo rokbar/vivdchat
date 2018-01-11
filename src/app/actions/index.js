@@ -182,7 +182,17 @@ export function leaveGroup(group) {
         dispatch({
           type: LEAVE_GROUP,
           payload: response.data,
-        });
+        });        
+      })
+      .then(() => {
+        return axios.post(
+          `${ROOT_URL}/groups/deleteUserMessages`,
+          { group },
+          { headers: { authorization: localStorage.getItem('token'), } }
+        )
+      })
+      .then((response) => {
+        console.log(response);
       });
   }
 }

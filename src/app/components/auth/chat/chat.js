@@ -50,11 +50,11 @@ class Chat extends Component {
 
   render() {
     return (
-      <div>
-        <div style={{height: '85vh'}} id="messages">
+      <div style={{display: 'flex', flexDirection: 'column'}}>
+        <div style={{overflowY: 'scroll' }} id="messages">
           <MessageList messages={this.props.messages} groupName={this.props.groupName} />
         </div>
-        <BottomNavigation styles={{height: '120px'}} id="inputs">
+        <BottomNavigation style={{borderTop: 'solid 1px rgba(0, 0, 0, 0.12)', paddingTop: '20px', width: '100%', height:'130px'}} id="inputs">
           <MessageInput socket={this.socket} />
         </ BottomNavigation>
       </div>

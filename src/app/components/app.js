@@ -7,6 +7,7 @@ import {
   getMuiTheme, 
   lightBaseTheme,
 } from 'material-ui/styles';
+import mail from 'material-ui/svg-icons/content/mail';
 
 injectTapEventPlugin();
 
@@ -30,5 +31,7 @@ export default class App extends Component {
 const styles = {
   paper: {
     height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
   },
 }

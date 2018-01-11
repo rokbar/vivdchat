@@ -9,9 +9,9 @@ export default function(state = [], action) {
     case FETCH_GROUP_MESSAGES:
       return action.payload;
     case APPEND_MESSAGE:
-      return [...state, action.payload];
+      return [ action.payload, ...state ];
     case RECEIVE_MESSAGE:
-      return [...state, action.payload];
+      return [ action.payload, ...state ];
   }
 
   return state;

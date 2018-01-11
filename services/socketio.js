@@ -28,7 +28,7 @@ function joinRoom(socket) {
     .on('send message', (message) => {
       // works on single node only, 
       // if there is more than one node running try socketio-redis library
-      if (socket.adapter.rooms[group].sockets[socket.id]) {
+      if (group && socket && socket.adapter.rooms[group].sockets[socket.id]) {
         saveMessage({ ...message, username: name, sub, group }, (payload) => {
           socket.broadcast.to(group).emit('receive message', payload);
         });

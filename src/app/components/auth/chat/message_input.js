@@ -109,8 +109,9 @@ export default connect(null, { appendMessage })(MessageInput);
 
 const styles = {
   messageInput: {
-    position: 'fixed',
+    position: 'relative',
     bottom: 0,
     padding: '0px 0px 10px 10px',
+    flex: '1',
   },
 };
