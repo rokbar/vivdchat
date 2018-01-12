@@ -18,3 +18,6 @@ export const LEAVE_GROUP = 'leave-group';
 
 export const API_ERROR = 'api-error';
 export const CLEAR_ERROR = 'clear-error';
+
+export const MODAL_OPEN = 'modal-open';
+export const MODAL_CLOSE = 'modal-close';

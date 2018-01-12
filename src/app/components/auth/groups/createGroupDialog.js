@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Field, reduxForm } from 'redux-form';
 import { FlatButton, TextField, Dialog, Paper } from 'material-ui';
 import { connect } from 'react-redux';
-import { createNewGroup, apiError } from '../../../actions';
+import { createNewGroup } from '../../../actions';
 
 class CreateGroupDialog extends Component {
   constructor(props) {

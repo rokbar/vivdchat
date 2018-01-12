@@ -9,7 +9,8 @@ import {
   fetchGroupsByUser,
   acceptInvitation,
   declineInvitation,
-  leaveGroup
+  leaveGroup,
+  apiError,
 } from '../../../actions/index';
 
 class Groups extends Component {
@@ -32,6 +33,7 @@ class Groups extends Component {
 
   handleCloseCreateGroup = () => {
     this.setState({ openCreateGroup: false });
+    this.props.apiError(null);
   }
 
   handleOpenInviteUser = (groupId) => {
@@ -46,6 +48,7 @@ class Groups extends Component {
       openInviteUser: false,
       selectedGroup: false,
     });
+    this.props.apiError(null);
   }
 
   componentDidMount() {
@@ -101,5 +104,6 @@ export default connect(
     acceptInvitation,
     declineInvitation,
     leaveGroup,
+    apiError,
   }
 )(Groups);

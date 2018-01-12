@@ -17,6 +17,8 @@ import {
   RECEIVE_MESSAGE,
   API_ERROR,
   CLEAR_ERROR,
+  MODAL_OPEN,
+  MODAL_CLOSE,
 } from './types';
 
 // TODO: move to config file
@@ -94,6 +96,12 @@ export function createNewGroup({ name }, resolve, reject) {
         });
         resolve();
       })
+      .then(() => {
+        dispatch({
+          type: MODAL_OPEN,
+          payload: { title: 'Success', message: 'Group is created.', show: true },
+        });
+      })
       .catch(error => {
         error.response && dispatch(apiError(error.response.data.error));
         reject();
@@ -111,6 +119,12 @@ export function fetchGroupsByUser() {
           type: FETCH_GROUPS_BY_USER,
           payload: response.data,
         });
+      })
+      .catch(error => {
+        dispatch({
+          type: MODAL_OPEN,
+          payload: { title: 'Error', message: error.response.data.error, show: true },
+        });
       });
   }
 }
@@ -122,20 +136,26 @@ export function inviteUser({ group, user }, resolve, reject) {
       { group, user },
       { headers: { authorization: localStorage.getItem('token'), } }
     )
-    .then(response => {
-      dispatch({
-        type: CLEAR_ERROR,
+      .then(response => {
+        dispatch({
+          type: CLEAR_ERROR,
+        });
+        dispatch({
+          type: INVITE_USER,
+          payload: response.data,
+        });
+        resolve();
+      })
+      .then(() => {
+        dispatch({
+          type: MODAL_OPEN,
+          payload: { title: 'Success', message: 'User is invited.', show: true },
+        });
+      })
+      .catch(error => {
+        error.response && dispatch(apiError(error.response.data.error));
+        reject();
       });
-      dispatch({
-        type: INVITE_USER,
-        payload: response.data,
-      });
-      resolve();
-    })
-    .catch(error => {
-      error.response && dispatch(apiError(error.response.data.error));
-      reject();
-    });
   }
 }
 
@@ -150,6 +170,18 @@ export function acceptInvitation(group) {
         dispatch({
           type: ACCEPT_INVITATION,
           payload: response.data,
+        });
+      })
+      .then(() => {
+        dispatch({
+          type: MODAL_OPEN,
+          payload: { title: 'Success', message: 'Invitation is accepted.', show: true },
+        });
+      })
+      .catch(error => {
+        dispatch({
+          type: MODAL_OPEN,
+          payload: { title: 'Error', message: error.response.data.error, show: true },
         });
       });
   }
@@ -167,6 +199,18 @@ export function declineInvitation(group) {
           type: ACCEPT_INVITATION,
           payload: response.data,
         });
+      })
+      .then(() => {
+        dispatch({
+          type: MODAL_OPEN,
+          payload: { title: 'Success', message: 'Invitation is declined.', show: true },
+        });
+      })
+      .catch(error => {
+        dispatch({
+          type: MODAL_OPEN,
+          payload: { title: 'Error', message: error.response.data.error, show: true },
+        });
       });
   }
 }
@@ -182,7 +226,7 @@ export function leaveGroup(group) {
         dispatch({
           type: LEAVE_GROUP,
           payload: response.data,
-        });        
+        });
       })
       .then(() => {
         return axios.post(
@@ -191,8 +235,17 @@ export function leaveGroup(group) {
           { headers: { authorization: localStorage.getItem('token'), } }
         )
       })
-      .then((response) => {
-        console.log(response);
+      .then(() => {
+        dispatch({
+          type: MODAL_OPEN,
+          payload: { title: 'Success', message: 'You have left the group.', show: true },
+        });
+      })
+      .catch(error => {
+        dispatch({
+          type: MODAL_OPEN,
+          payload: { title: 'Error', message: error.response.data.error, show: true },
+        });
       });
   }
 }
@@ -212,9 +265,12 @@ export function fetchMessagesByGroup(group) {
           payload: response.data.name,
         });
       })
-      .catch((err) => {
-        console.log(err);
+      .catch((error) => {
         browserHistory.push('/groups');
+        dispatch({
+          type: MODAL_OPEN,
+          payload: { title: 'Error', message: error.response.data.error, show: true },
+        });
       });
   }
 }
@@ -237,5 +293,19 @@ export function apiError(error) {
   return {
     type: API_ERROR,
     payload: error,
+  }
+}
+
+export function openModal(title, message, show) {
+  return {
+    type: MODAL_OPEN,
+    payload: { title, message, show },
+  }
+}
+
+export function closeModal() {
+  return {
+    type: MODAL_CLOSE,
+    payload: { title: null, message: null, show: false },
   }
 }
